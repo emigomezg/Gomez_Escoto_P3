@@ -18,14 +18,15 @@ static const uint8_t year_memory = 0x06;
 
 uint8_t MCP7940M_set_seconds(uint8_t seconds)
 {
+	uint8_t err = FALSE;
 	if(seconds>=0 &&  seconds<60){
 		seconds = ((seconds / 10) << 4) | (seconds % 10);
 		seconds|=0x80;
 		I2C_start(I2C_0);//sends start bit
 		I2C_write_byte(I2C_0, MCP7940M_WRITE_ADD);//writes the direction of RTC with the write bit enable
 		I2C_wait(I2C_0);//waits for response in the line
-		I2C_get_ack(I2C_0);//reads the acknowledge
-
+		err = !(I2C_get_ack(I2C_0));//reads the acknowledge
+		if(err){
 		I2C_write_byte(I2C_0, seconds_memory);//the memory direction for seconds
 		I2C_wait(I2C_0);//waits for acknowledge
 		I2C_get_ack(I2C_0);//reads acknowledge
@@ -33,7 +34,7 @@ uint8_t MCP7940M_set_seconds(uint8_t seconds)
 		I2C_write_byte(I2C_0, seconds);//set seconds and start the clock
 		I2C_wait(I2C_0);//wait for acknowledge
 		I2C_get_ack(I2C_0);//reads acknowledge
-
+		}
 		I2C_stop(I2C_0);//sends nack and stop comunications
 		return TRUE;
 	}

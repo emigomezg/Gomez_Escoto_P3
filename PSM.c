@@ -159,6 +159,12 @@ uint8_t PSM_GET_CHANGE(terminals state)
 					}
 				break;
 				case ST_READ_HOUR:
+					g_terminal1.exit_state = GET_TIME_get_exit_flag(GTIME_TERMINAL0);
+					if (g_terminal1.exit_state) {
+						SET_TIME_clean_exit_flag(GTIME_TERMINAL0);
+						g_terminal1.current_state = ST_MENU;
+						g_terminal1.change_state =TRUE;
+					}
 				break;
 				case ST_DISP_HOUR_MAT:
 				break;
@@ -167,6 +173,12 @@ uint8_t PSM_GET_CHANGE(terminals state)
 				case ST_DISP_MSG:
 				break;
 				case ST_READ_DATE:
+					g_terminal1.exit_state = GET_DATE_get_exit_flag(GDATE_TERMINAL0);
+					if (g_terminal1.exit_state) {
+						GET_DATE_clean_exit_flag(GDATE_TERMINAL0);
+						g_terminal1.current_state = ST_MENU;
+						g_terminal1.change_state =TRUE;
+					}
 				break;
 				default:
 				break;
@@ -211,6 +223,8 @@ void PSM_STM(uint8_t state)
 					}
 				break;
 				case ST_READ_HOUR:
+					GET_TIME_display(TIME_TERMINAL0);
+					UART_callback_init(GET_TIME_uart0_handler, UART_0);
 				break;
 				case ST_DISP_HOUR_MAT:
 				break;
@@ -219,6 +233,8 @@ void PSM_STM(uint8_t state)
 				case ST_DISP_MSG:
 				break;
 				case ST_READ_DATE:
+					GET_DATE_display(DATE_TERMINAL0);
+					UART_callback_init(GET_DATE_uart0_handler, UART_0);
 				break;
 				default:
 				break;
@@ -315,6 +331,7 @@ void PSM0_STATE_MENU(void)
 void PSM_INIT(void)
 {
 	PSM_UARTS_setting();
+	I2C_init(I2C_0, CLK_K64, baud_rate);
 	g_terminal1.current_state = ST_MENU;
 	g_terminal2.current_state = ST_MENU;
 	g_terminal1.change_state = TRUE;

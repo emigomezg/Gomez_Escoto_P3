@@ -24,6 +24,9 @@
 #include "time/set_time.h"
 #include "date/set_date.h"
 
+#include "time/get_time.h"
+#include "date/get_date.h"
+
 typedef enum{
 	ST_MENU,ST_CHAT,ST_SET_HOUR,ST_SET_DATE,ST_READ_HOUR,ST_DISP_HOUR_MAT,ST_SET_MSG,ST_DISP_MSG,ST_READ_DATE
 }pms_states_t;

@@ -16,7 +16,7 @@ static int8_t clean_screen_all[] = { "\033[1J" };
 //static int8_t green_text_red_char_background[] = { "\033[0;32;41m" };
 static int8_t red_back_yellow[] = { "\033[0;35;43m" };/** VT100 command for text in red and background in cyan*/
 static int8_t title_pos[] = { "\033[10:10H" };
-static int8_t title[] = { "\tget Time\r" };
+static int8_t title[] = { "\tget Datee\r" };
 static int8_t chat_menu_pos[] = { "\033[15:10H" };
 static int8_t chat[] = { "current time time is: " };
 static int8_t ret_pos[] = { "\033[16:10H" };
@@ -26,8 +26,8 @@ static int8_t return_status_pos[] = { "\033[18:10H" };
 static int8_t return_status[] = { "err getting time\t" };
 static int8_t unsucc[] = { "Unsuccessful\n\r" };
 
-uint8_t get_date0_exit_flag = FALSE;
-uint8_t get_date1_exit_flag = FALSE;
+static uint8_t get_date0_exit_flag = FALSE;
+static uint8_t get_date1_exit_flag = FALSE;
 
 void GET_DATE_display(gdate_profil_t terminal)
 {
@@ -105,35 +105,36 @@ void GET_DATE_display(gdate_profil_t terminal)
 }
 
 void GET_DATE0_PIT_handler(void)
-{
-	uint8_t seconds = MCP7940M_get_seconds();
-	uint8_t minutes = MCP7940M_get_minutes();
-	uint8_t hours = MCP7940M_get_hours();
-	FIFO_push(&date0, (hours / 10) + '0');
-	FIFO_push(&date0, (hours % 10) + '0');
-	FIFO_push(&date0, '/');
-	FIFO_push(&date0, (minutes / 10) + '0');
-	FIFO_push(&date0, (minutes % 10) + '0');
-	FIFO_push(&date0, '/');
-	FIFO_push(&date0, (seconds / 10) + '0');
-	FIFO_push(&date0, (seconds % 10) + '0');
+{uint8_t day = MCP7940M_get_day();
+uint8_t month = MCP7940M_get_month();
+uint8_t year = MCP7940M_get_year();
+FIFO_push(&date0, (day / 10) + '0');
+FIFO_push(&date0, (day % 10) + '0');
+FIFO_push(&date0, '/');
+FIFO_push(&date0, (month / 10) + '0');
+FIFO_push(&date0, (month % 10) + '0');
+FIFO_push(&date0, '/');
+FIFO_push(&date0, (year / 10) + '0');
+FIFO_push(&date0, (year % 10) + '0');
 	GET_DATE_send_to_UART(GDATE_TERMINAL0);
+	PIT_disable_timer(PIT_1);
 
 }
 void GET_DATE1_PIT_handler(void)
 {
-	uint8_t seconds = MCP7940M_get_seconds();
-	uint8_t minutes = MCP7940M_get_minutes();
-	uint8_t hours = MCP7940M_get_hours();
-	FIFO_push(&date1, (hours / 10) + '0');
-	FIFO_push(&date1, (hours % 10) + '0');
+	uint8_t day = MCP7940M_get_day();
+	uint8_t month = MCP7940M_get_month();
+	uint8_t year = MCP7940M_get_year();
+	FIFO_push(&date1, (day / 10) + '0');
+	FIFO_push(&date1, (day % 10) + '0');
 	FIFO_push(&date1, '/');
-	FIFO_push(&date1, (minutes / 10) + '0');
-	FIFO_push(&date1, (minutes % 10) + '0');
+	FIFO_push(&date1, (month / 10) + '0');
+	FIFO_push(&date1, (month % 10) + '0');
 	FIFO_push(&date1, '/');
-	FIFO_push(&date1, (seconds / 10) + '0');
-	FIFO_push(&date1, (seconds % 10) + '0');
+	FIFO_push(&date1, (year / 10) + '0');
+	FIFO_push(&date1, (year % 10) + '0');
 	GET_DATE_send_to_UART(GDATE_TERMINAL1);
+	PIT_disable_timer(PIT_2);
 
 }
 

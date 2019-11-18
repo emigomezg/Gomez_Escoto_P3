@@ -40,7 +40,7 @@ uint8_t FIFO_POP(fifos_t * fifo)
 	uint8_t ret_data  = 0x00;
 	if(FIFO_getStatus(fifo)!=FIFO_EMPTY){
 		ret_data = fifo->data[0];
-		for(uint8_t counter = 0; counter<(fifo->max_size-1);counter++)
+		for(uint8_t counter = 0; counter<(fifo->max_size);counter++)
 			fifo->data[counter] = fifo->data[counter+1];
 		fifo->index--;
 		if(fifo->index == FIFO_EMPTY)

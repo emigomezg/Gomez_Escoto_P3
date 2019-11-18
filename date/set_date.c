@@ -12,7 +12,7 @@ static int8_t clean_screen_all[] = { "\033[1J" };
 //static int8_t green_text_red_char_background[] = { "\033[0;32;41m" };
 static int8_t red_back_yellow[] = { "\033[0;35;43m" };/** VT100 command for text in red and background in cyan*/
 static int8_t title_pos[] = { "\033[10:10H" };
-static int8_t title[] = { "\tset Datee\r" };
+static int8_t title[] = { "\tset Date\r" };
 static int8_t chat_menu_pos[] = { "\033[12:10H" };
 static int8_t chat[] = { "Write date in \"dd/mm/yy\" format\r\n" };
 static int8_t return_status_pos[] = { "\033[13:10H" };
@@ -100,24 +100,23 @@ void SET_DATE_uart0_handler(void)
 	} else if (data_recived == '\e') {
 		set_date0_exit_flag = TRUE;
 	} else if (date0.status == FIFO_FULL) {
-		uint8_t hh[2];
-		hh[0] = FIFO_POP(&date0);
-		hh[1] = FIFO_POP(&date0);
+		uint8_t dd[2];
+		dd[0] = FIFO_POP(&date0);
+		dd[1] = FIFO_POP(&date0);
 		FIFO_POP(&date0);
 		uint8_t mm[2];
 		mm[0] = FIFO_POP(&date0);
 		mm[1] = FIFO_POP(&date0);
 		FIFO_POP(&date0);
-		uint8_t ss[2];
-		ss[0] = FIFO_POP(&date0);
-		ss[1] = FIFO_POP(&date0);
-		uint8_t hours = (hh[0] - '0') * 10 + (hh[1] - '0');
-		uint8_t minutes = (mm[0] - '0') * 10 + (mm[1] - '0');
-		uint8_t seconds = (ss[0] - '0') * 10 + (ss[1] - '0');
-		if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
-			err_flag = MCP7940M_set_seconds(seconds);
-			MCP7940M_set_minutes(minutes);
-			MCP7940M_set_hours(hours);
+		uint8_t aa[2];
+		aa[0] = FIFO_POP(&date0);
+		aa[1] = FIFO_POP(&date0);
+		uint8_t days = (dd[0] - '0') * 10 + (dd[1] - '0');
+		uint8_t month = (mm[0] - '0') * 10 + (mm[1] - '0');
+		uint8_t year = (aa[0] - '0') * 10 + (aa[1] - '0');
+		if (days >= 0 && days < 24 && month >= 0 && month < 60 && year >= 0 && year < 60) {
+			err_flag = MCP7940M_set_date(days, month, year);
+
 			if (err_flag) {
 				UART_put_string(UART_0, &return_status_pos[0]);
 				UART_put_string(UART_0, &return_status[0]);
