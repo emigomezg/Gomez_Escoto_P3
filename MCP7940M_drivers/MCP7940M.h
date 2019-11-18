@@ -109,13 +109,13 @@ uint8_t MCP7940M_get_hours(void);
  /********************************************************************************************/
  /*!
   	 \brief
-  	 	 it configures the day on RTC
+  	 	 it configures the date (day, month and year) on RTC
   	 	 It is recommended to use pin 2 and 3 of GPIOB.
   	 \param[in] day in uint8_t format, month in uint8_t format
   	 	 	 	 year in uint8_t format
   	 \return void
   */
-void MCP7940M_set_day(uint8_t day, uint8_t month, uint8_t year);
+void MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year);
 
 /********************************************************************************************/
  /********************************************************************************************/
@@ -146,7 +146,7 @@ void MCP7940M_set_year(uint8_t year);
  /********************************************************************************************/
  /*!
   	 \brief
-  	 	 it returns the day from the RTC
+  	 	 it sets the date to the RTC
   	 	 It is recommended to use pin 2 and 3 of GPIOB.
   	 \param[in] void
   	 \return uint8_t
@@ -158,7 +158,7 @@ uint8_t MCP7940M_get_day(void);
  /********************************************************************************************/
  /*!
   	 \brief
-  	 	 it returns the month from the RTC
+  	 	  it sets the month to the RTC
   	 	 It is recommended to use pin 2 and 3 of GPIOB.
   	 \param[in] void
   	 \return uint8_t
@@ -170,7 +170,7 @@ uint8_t MCP7940M_get_month(void);
  /********************************************************************************************/
  /*!
   	 \brief
-  	 	 it returns the year from the RTC
+  	 	  it sets the year to the RTC
   	 	 It is recommended to use pin 2 and 3 of GPIOB.
   	 \param[in] void
   	 \return uint8_t

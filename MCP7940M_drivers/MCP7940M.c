@@ -47,11 +47,11 @@ void MCP7940M_set_minutes(uint8_t minutes)
 		I2C_wait(I2C_0);//waits for response in the line
 		I2C_get_ack(I2C_0);//reads the acknowledge
 
-		I2C_write_byte(I2C_0, minutes_memory);//the memory direction for seconds
+		I2C_write_byte(I2C_0, minutes_memory);//the memory direction for minutes
 		I2C_wait(I2C_0);//waits for acknowledge
 		I2C_get_ack(I2C_0);//reads acknowledge
 
-		I2C_write_byte(I2C_0, minutes);//set seconds and start the clock
+		I2C_write_byte(I2C_0, minutes);//set minutes and start the clock
 		I2C_wait(I2C_0);//wait for acknowledge
 		I2C_get_ack(I2C_0);//reads acknowledge
 
@@ -68,11 +68,11 @@ void MCP7940M_set_hours(uint8_t hours)
 		I2C_wait(I2C_0);//waits for response in the line
 		I2C_get_ack(I2C_0);//reads the acknowledge
 
-		I2C_write_byte(I2C_0, hours_memory);//the memory direction for seconds
+		I2C_write_byte(I2C_0, hours_memory);//the memory direction for hours
 		I2C_wait(I2C_0);//waits for acknowledge
 		I2C_get_ack(I2C_0);//reads acknowledge
 
-		I2C_write_byte(I2C_0, hours);//set seconds and start the clock
+		I2C_write_byte(I2C_0, hours);//set hours and start the clock
 		I2C_wait(I2C_0);//wait for acknowledge
 		I2C_get_ack(I2C_0);//reads acknowledge
 
@@ -117,7 +117,7 @@ uint8_t MCP7940M_get_minutes(void)
 	I2C_wait(I2C_0);//waits for response
 	I2C_get_ack(I2C_0);//reads acknowledge
 
-	I2C_write_byte(I2C_0, minutes_memory);//states you want to read the seconds
+	I2C_write_byte(I2C_0, minutes_memory);//states you want to read the minutes
 	I2C_wait(I2C_0);//waits for response
 	I2C_get_ack(I2C_0);//reads  acknowledge
 
@@ -166,7 +166,7 @@ uint8_t MCP7940M_get_hours(void)
 	 return  ((data & 0xF0) >> 4) * 10 + (data & 0x0F);
 }
 
-void MCP7940M_set_day(uint8_t day, uint8_t month, uint8_t year)
+void MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year)
 {
 	uint8_t day_limit = 0;
 	/*Month of input date is validated*/
@@ -258,6 +258,8 @@ void MCP7940M_set_day(uint8_t day, uint8_t month, uint8_t year)
 
 				I2C_stop(I2C_0);//sends nack and stop comunications
 			}
+		MCP7940M_set_month(month);
+		MCP7940M_set_year(year);
 	}
 }
 
@@ -285,7 +287,7 @@ void MCP7940M_set_month(uint8_t month)
 
 void MCP7940M_set_year(uint8_t year)
 {
-	if(year>=1 &&  year<13)
+	if(year>=1 &&  year<99)
 	{
 		year =((year / 10) << 4) | (year % 10);
 		I2C_start(I2C_0);//sends start bit
@@ -293,7 +295,7 @@ void MCP7940M_set_year(uint8_t year)
 		I2C_wait(I2C_0);//waits for response in the line
 		I2C_get_ack(I2C_0);//reads the acknowledge
 
-		I2C_write_byte(I2C_0, year_memory);//the memory direction for seconds
+		I2C_write_byte(I2C_0, year_memory);//the memory direction for year
 		I2C_wait(I2C_0);//waits for acknowledge
 		I2C_get_ack(I2C_0);//reads acknowledge
 
