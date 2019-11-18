@@ -13,9 +13,7 @@
 
 #include <stdint.h>
 #include "MK64F12.h"
-#include "bits.h"
-
-#define SYSTEM_CLOCK 21000000U
+#include "GPIO.h"
 
 /**
  * \brief A mail box type definition for serial port
@@ -84,29 +82,80 @@ void UART_put_char (uart_channel_t uart_channel, uint8_t character);
  	 \return void
  */
 void UART_put_string(uart_channel_t uart_channel, int8_t* string);
-
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 it handles the uart ISR
+ 	 \param[in]  void.
+ 	 \return void
+ */
 void UART0_RX_TX_IRQHandler(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 it handles the uart ISR
+ 	 \param[in]  void.
+ 	 \return void
+ */
 void UART1_RX_TX_IRQHandler(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 It sets the UART flag
+ 	 \param[in]  void
+ 	 \return void
+ */
 
-void UART_callback_init(void (*handler)(void),uint8_t uart);
+void UART_set_flag(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 It clears the UART flag
+ 	 \param[in]  void
+ 	 \return void
+ */
+void UART_clear_flag(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 It returns the UART flag status
+ 	 \param[in]  void
+ 	 \return uint8_t
+ */
+uint8_t UART_get_flag(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 It sets the UART data to store in mailbox
+ 	 \param[in]  uint8_t
+ 	 \return void
+ */
+void UART_set_mailbox(uint8_t data);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 It returns the UART data stored in mailbox
+ 	 \param[in]  uart_channel_t
+ 	 \return uint8_t
+ */
+uint8_t UART_get_mailbox(uart_channel_t uart_channel);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 It sets the UART RX interrupt handler
+ 	 \param[in]  handler
+ 	 \param[in]  uart_channel_t
+ 	 \return void
+ */
 
-void UART0_reception_handler (void);
-
-void UART1_reception_handler (void);
-
-void UART2_reception_handler (void);
-
-void UART3_reception_handler (void);
-
-void UART4_reception_handler (void);
-
-void UART5_reception_handler (void);
-
-uint8_t get_UART_flag_state(uint8_t uart);
-
-uint8_t get_UART_mailbox(uint8_t uart);
-
-void UART_mailbox_clear_flag(uint8_t uart);
-
+void UART_callback_init(void (*handler)(void),uart_channel_t uart_channel);
 
 #endif /* UART_H_ */

@@ -1,6 +1,11 @@
 #include "UART.h"
 
+static void (*UART0_RX_HANDLER)(void) = 0;
+static void (*UART1_RX_HANDLER)(void) = 0;
+
+
 static uart_mail_box_t g_mail_box_uart_0;
+static uart_mail_box_t g_mail_box_uart_1;
 
 void UART_set_flag(void)
 {
@@ -18,9 +23,19 @@ void UART_set_mailbox(uint8_t data)
 {
 	g_mail_box_uart_0.mailBox = data;
 }
-uint8_t UART_get_mailbox(void)
+uint8_t UART_get_mailbox(uart_channel_t uart_channel)
 {
-	return g_mail_box_uart_0.mailBox;
+	switch((uint8_t)uart_channel)
+	{
+		case UART_0:
+			return g_mail_box_uart_0.mailBox;
+			break;
+		case UART_1:
+			return g_mail_box_uart_1.mailBox;
+			break;
+	}
+	return 0;
+
 }
 
 void UART_clock_gating(uart_channel_t uart_channel) {
@@ -151,5 +166,34 @@ void UART0_RX_TX_IRQHandler(void) {
 		;
 	g_mail_box_uart_0.flag = 1;
 	g_mail_box_uart_0.mailBox = UART0->D;
+	if(UART0_RX_HANDLER)
+		UART0_RX_HANDLER();
 
+
+}
+void UART1_RX_TX_IRQHandler(void) {
+
+	while (!(UART1->S1 & UART_S1_RDRF_MASK))
+		;
+	g_mail_box_uart_1.flag = 1;
+	g_mail_box_uart_1.mailBox = UART1->D;
+
+}
+
+void UART_callback_init(void (*handler)(void),uart_channel_t uart_channel)
+{
+	if (handler)
+	{
+		switch((uint8_t) uart_channel)
+		{
+		case UART_0:
+			UART0_RX_HANDLER = handler;
+			break;
+		case UART_1:
+			UART1_RX_HANDLER = handler;
+			break;
+		default:
+			break;
+		}
+	}
 }

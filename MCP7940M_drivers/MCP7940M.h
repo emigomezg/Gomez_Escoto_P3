@@ -7,7 +7,7 @@
 
 #ifndef MCP7940M_H_
 #define MCP7940M_H_
-#include "I2C.h"
+#include "../drivers/I2C.h"
 #include "MK64F12.h"
 
 typedef enum month_number{
@@ -37,7 +37,6 @@ typedef enum month_number{
   	 	 It's also recommended to use this as last step
   	 \param[in] second in uint8_t format
   	 \return void
-
   */
 uint8_t MCP7940M_set_seconds(uint8_t seconds);
 
@@ -74,7 +73,6 @@ uint8_t MCP7940M_set_hours(uint8_t hours);
   	 	 It is recommended to use pin 2 and 3 of GPIOB.
   	 \param[in] void
   	 \return uint8_t
-
   */
 uint8_t MCP7940M_get_seconds(void);
 
@@ -87,7 +85,6 @@ uint8_t MCP7940M_get_seconds(void);
   	 	 It is recommended to use pin 2 and 3 of GPIOB.
   	 \param[in] void
   	 \return uint8_t
-
   */
 uint8_t MCP7940M_get_minutes(void);
 
@@ -100,7 +97,6 @@ uint8_t MCP7940M_get_minutes(void);
   	 	 It is recommended to use pin 2 and 3 of GPIOB.
   	 \param[in] void
   	 \return uint8_t
-
   */
 uint8_t MCP7940M_get_hours(void);
 
