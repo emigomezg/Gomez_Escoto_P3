@@ -11,8 +11,8 @@
 
 #define CLK_K64 21000000U
 #define baud_rate 1600000u
-static state_machine_t g_terminal1;
-static state_machine_t g_terminal2;
+static state_machine_t g_terminal1 = { 0 };
+static state_machine_t g_terminal2 = { 0 };
 
 static in_use_flags_t g_flags = { 0 };
 
@@ -133,6 +133,64 @@ uint8_t PSM_GET_CHANGE(terminals state)
 	switch ((uint8_t) state)
 	{
 		case TERMINAL0:
+			switch (g_terminal1.current_state)
+			{
+				case ST_CHAT:
+				break;
+				case ST_SET_HOUR:
+					//g_terminal1.change_state = TRUE;
+					g_terminal1.exit_state = SET_TIME_get_exit_flag(TIME_TERMINAL0);
+					if (g_terminal1.exit_state) {
+						SET_TIME_clean_exit_flag(TIME_TERMINAL0);
+						g_terminal1.current_state = ST_MENU;
+						g_flags.in_use_set_time_f = FALSE;
+						g_terminal1.change_state = TRUE;
+
+					}
+				break;
+				case ST_SET_DATE:
+					//g_terminal1.change_state = TRUE;
+					g_terminal1.exit_state = SET_DATE_get_exit_flag(DATE_TERMINAL0);
+					if (g_terminal1.exit_state) {
+						SET_DATE_clean_exit_flag(DATE_TERMINAL0);
+						g_terminal1.current_state = ST_MENU;
+						g_flags.in_use_set_date_f = FALSE;
+						g_terminal1.change_state = TRUE;
+					}
+				break;
+				case ST_READ_HOUR:
+					g_terminal1.exit_state = GET_TIME_get_exit_flag(GTIME_TERMINAL0);
+					if (g_terminal1.exit_state) {
+						GET_TIME_clean_exit_flag(GTIME_TERMINAL0);
+						g_terminal1.current_state = ST_MENU;
+						g_terminal1.change_state = TRUE;
+					}
+				break;
+				case ST_DISP_HOUR_MAT:
+				break;
+				case ST_SET_MSG:
+					g_terminal1.exit_state = SET_MSG_get_exit_flag(MSG_TERMINAL0);
+					if (g_terminal1.exit_state) {
+						SET_MSG_clean_exit_flag(MSG_TERMINAL0);
+						g_terminal1.current_state = ST_MENU;
+						g_flags.in_use_set_msg_f = FALSE;
+						g_terminal1.change_state = TRUE;
+					}
+				break;
+				case ST_DISP_MSG:
+				break;
+				case ST_READ_DATE:
+					g_terminal1.exit_state = GET_DATE_get_exit_flag(GDATE_TERMINAL0);
+					if (g_terminal1.exit_state) {
+						GET_DATE_clean_exit_flag(GDATE_TERMINAL0);
+						g_terminal1.current_state = ST_MENU;
+						g_terminal1.change_state = TRUE;
+					}
+
+				break;
+				default:
+				break;
+			}
 			return g_terminal1.change_state;
 		break;
 		case TERMINAL1:
@@ -156,22 +214,40 @@ void PSM_STM(uint8_t state)
 				break;
 				case ST_CHAT:
 					g_flags.uart0_active_f = TRUE;
+
 				break;
 				case ST_SET_HOUR:
-					g_flags.in_use_set_time_f = TRUE;
+					if (!g_flags.in_use_set_time_f) {
+						g_flags.in_use_set_time_f = TRUE;
+						SET_TIME_display(TIME_TERMINAL0);
+						UART_callback_init(SET_TIME_uart0_handler, UART_0);
+					}
 				break;
 				case ST_SET_DATE:
-					g_flags.in_use_set_date_f = TRUE;
+					if (!g_flags.in_use_set_date_f) {
+						g_flags.in_use_set_date_f = TRUE;
+						SET_DATE_display(DATE_TERMINAL0);
+						UART_callback_init(SET_DATE_uart0_handler, UART_0);
+					}
 				break;
 				case ST_READ_HOUR:
+					GET_TIME_display(TIME_TERMINAL0);
+					UART_callback_init(GET_TIME_uart0_handler, UART_0);
 				break;
 				case ST_DISP_HOUR_MAT:
 				break;
 				case ST_SET_MSG:
+					if (!g_flags.in_use_set_time_f) {
+						g_flags.in_use_set_msg_f = TRUE;
+						SET_MSG_display(MSG_TERMINAL0);
+						UART_callback_init(SET_MSG_uart0_handler, UART_0);
+					}
 				break;
 				case ST_DISP_MSG:
 				break;
 				case ST_READ_DATE:
+					GET_DATE_display(DATE_TERMINAL0);
+					UART_callback_init(GET_DATE_uart0_handler, UART_0);
 				break;
 				default:
 				break;
@@ -268,6 +344,7 @@ void PSM0_STATE_MENU(void)
 void PSM_INIT(void)
 {
 	PSM_UARTS_setting();
+	I2C_init(I2C_0, CLK_K64, baud_rate);
 	g_terminal1.current_state = ST_MENU;
 	g_terminal2.current_state = ST_MENU;
 	g_terminal1.change_state = TRUE;

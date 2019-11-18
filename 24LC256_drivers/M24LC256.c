@@ -6,10 +6,10 @@
  */
 
 #include "M24LC256.h"
-#define M24LC256_READ 1
-#define M24LC256_WRITE 0
+#define M24LC256_READ 0xA1
+#define M24LC256_WRITE 0xA0
 
-static const uint8_t g_base_address = 0xA0;
+static const uint8_t g_base_address = 0x00;
 static uint8_t g_address = 0x00;
 
 void M24LC256_set_i2c_mem(a0_m24lc256_t a0, a0_m24lc256_t a1, a2_m24lc256_t a2)
@@ -17,16 +17,17 @@ void M24LC256_set_i2c_mem(a0_m24lc256_t a0, a0_m24lc256_t a1, a2_m24lc256_t a2)
 	g_address = g_base_address | (a0 << A0_SHIFT) | (a1 << A1_SHIFT) | (a2 << A2_SHIFT);
 }
 
-void M24LC256_Write_random(uint8_t data, uint16_t str_add)
+uint8_t M24LC256_Write_random(uint8_t data, uint16_t str_add)
 {
+	uint8_t pass = FALSE;
 	uint8_t high_address = (uint8_t) (str_add & 0x7F00);
 	uint8_t low_addres = (uint8_t) str_add & 0xFF;
 
 	I2C_start(I2C_0); /*sends start bit*/
-	I2C_write_byte(I2C_0, g_address + M24LC256_WRITE); /*writes the direction of RTC with the write bit enable*/
+	I2C_write_byte(I2C_0, M24LC256_WRITE); /*writes the direction of RTC with the write bit enable*/
 	I2C_wait(I2C_0); /*waits for response in the line*/
-	I2C_get_ack(I2C_0); /*reads the acknowledge*/
-
+	pass = !(I2C_get_ack(I2C_0)); /*reads the acknowledge*/
+	if(pass){
 	I2C_write_byte(I2C_0, high_address);/*HIGH half of memory address*/
 	I2C_wait(I2C_0); /*waits for acknowledge*/
 	I2C_get_ack(I2C_0); /*reads acknowledge*/
@@ -38,8 +39,12 @@ void M24LC256_Write_random(uint8_t data, uint16_t str_add)
 	I2C_write_byte(I2C_0, data); /*set data in address*/
 	I2C_wait(I2C_0); /*wait for acknowledge*/
 	I2C_get_ack(I2C_0); /*reads acknowledge*/
-
 	I2C_stop(I2C_0); /*sends nack and stop communications*/
+	return TRUE;
+	}else
+		I2C_stop(I2C_0); /*sends nack and stop communications*/
+	return FALSE;
+
 }
 
 void M24LC256_write_sequential(uint8_t *data_array, uint16_t num_data_write, uint16_t str_add)

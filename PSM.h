@@ -8,6 +8,7 @@
 #ifndef PSM_H_
 #define PSM_H_
 
+#include <date/set_date.h>
 #include "MK64F12.h"
 #include "adafruit/ht16k33.h"
 #include "adafruit/screen.h"
@@ -20,6 +21,17 @@
 #include "MCP7940M_drivers/MCP7940M.h"
 #include "drivers/GPIO.h"
 
+#include "time/set_time.h"
+#include "date/set_date.h"
+
+#include "time/get_time.h"
+#include "date/get_date.h"
+
+
+#include "msg/get_msg.h"
+#include "msg/set_msg.h"
+
+
 typedef enum{
 	ST_MENU,ST_CHAT,ST_SET_HOUR,ST_SET_DATE,ST_READ_HOUR,ST_DISP_HOUR_MAT,ST_SET_MSG,ST_DISP_MSG,ST_READ_DATE
 }pms_states_t;
@@ -27,6 +39,7 @@ typedef enum{
 typedef struct {
 	uint8_t current_state;
 	uint8_t change_state;
+	uint8_t exit_state;
 }state_machine_t;
 
 typedef enum{
@@ -36,12 +49,12 @@ typedef enum{
 
 
 typedef struct{
-		uint8_t in_use_set_time_f:1;
-		uint8_t in_use_set_date_f:1;
-		uint8_t in_use_matrix_f:1;
-		uint8_t uart0_active_f:1;
-		uint8_t uart1_active_f:1;
-		uint8_t in_use_set_msg_f:1;
+		uint8_t in_use_set_time_f;
+		uint8_t in_use_set_date_f;
+		uint8_t in_use_matrix_f;
+		uint8_t uart0_active_f;
+		uint8_t uart1_active_f;
+		uint8_t in_use_set_msg_f;
 	}in_use_flags_t;
 
 
