@@ -1,40 +1,41 @@
-/**
- \file
- \brief
- This file contains the main implementation for the K64 UART and Teraterm
- communication.
- \author Emiliano Gomez Guerrero
- \date   18/02/2019
- \todo:
- Interrupts are not implemented in this API implementation.
- */
+#include "PSM.h"
 
-#include "MK64F12.h"
-#include "UART_drivers.h"
-#include "NVIC.h"
-#include "bits.h"
+#define DEBUG 1
 
-int main (void)
+#ifdef DEBUG
+#include "stdio.h"
+#endif
+
+int main(void)
 {
-	uint8_t data = 0;
-	uint8_t flag = 0;
-    UART_init(UART_0, SYSTEM_CLOCK, BD_115200);
-    UART_interrupt_enable(UART_0);
 
-    UART_callback_init(UART0_reception_handler, UART_0);
+	PSM_INIT();
+	/*
+	 screen_clear_data();
+	 screen_add_Item_end('6');
+	 screen_add_Item_end('7');
+	 screen_add_Item_end('8');
+	 screen_add_Item_end('9');
+	 screen_add_Item_end('A');
 
-    NVIC_enable_interrupt_and_priotity(UART0_RX_TX_IRQn, PRIORITY_5);
-    NVIC_global_enable_interrupts;
+	 HT16k33_init();
+	 //HT16k33_sendMat(&data[0]);
+	 for(;;) {
+	 screen_send_array_2mat();
+	 screen_slideR();
+	 for(uint32_t a=0;a<400000;a++);
+	 }
+	 */
+	while (1) {
+		if (PSM_GET_CHANGE(TERMINAL0)) {
+			PSM_STM(TERMINAL0);
+			PSM_CLEAN_CHANGE(TERMINAL0);
+		}
+		if (PSM_GET_CHANGE(TERMINAL1)) {
+			PSM_STM(TERMINAL1);
+			PSM_CLEAN_CHANGE(TERMINAL1);
+		}
 
-
-    for(;;)
-    {
-    	flag = get_UART_flag_state(UART_0);
-    	if(TRUE == flag)
-    	{
-    		data = get_UART_data_state(UART_0);
-    		flag = 0;
-    	}
-    }
-    return 0;
+	}
+	return 0;
 }

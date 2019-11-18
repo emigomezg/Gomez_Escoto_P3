@@ -1,0 +1,61 @@
+/*
+ * PSM.h
+ *
+ *  Created on: Nov 17, 2019
+ *      Author: alvar
+ */
+
+#ifndef PSM_H_
+#define PSM_H_
+
+#include "MK64F12.h"
+#include "adafruit/ht16k33.h"
+#include "adafruit/screen.h"
+#include "adafruit/LETTERS_NUMS.h"
+#include "drivers/UART.h"
+#include "drivers/PIT.h"
+#include "drivers/NVIC.h"
+#include "drivers/I2C.h"
+#include "drivers/bits.h"
+#include "MCP7940M_drivers/MCP7940M.h"
+#include "drivers/GPIO.h"
+
+typedef enum{
+	ST_MENU,ST_CHAT,ST_SET_HOUR,ST_SET_DATE,ST_READ_HOUR,ST_DISP_HOUR_MAT,ST_SET_MSG,ST_DISP_MSG,ST_READ_DATE
+}pms_states_t;
+
+typedef struct {
+	uint8_t current_state;
+	uint8_t change_state;
+}state_machine_t;
+
+typedef enum{
+	TERMINAL0,
+	TERMINAL1
+}terminals;
+
+
+typedef struct{
+		uint8_t in_use_set_time_f:1;
+		uint8_t in_use_set_date_f:1;
+		uint8_t in_use_matrix_f:1;
+		uint8_t uart0_active_f:1;
+		uint8_t uart1_active_f:1;
+		uint8_t in_use_set_msg_f:1;
+	}in_use_flags_t;
+
+
+
+
+
+void PSM_INIT(void);
+
+uint8_t PSM_GET_CHANGE(terminals state);
+void PSM_STM(uint8_t);
+
+void PSM_CLEAN_CHANGE(terminals state);
+void PSM_main_menu(terminals ter);
+
+void PSM0_STATE_MENU(void);
+
+#endif /* PSM_H_ */
