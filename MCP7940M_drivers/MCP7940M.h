@@ -39,7 +39,7 @@ typedef enum month_number{
   	 \return void
 
   */
-void MCP7940M_set_seconds(uint8_t seconds);
+uint8_t MCP7940M_set_seconds(uint8_t seconds);
 
 /********************************************************************************************/
  /********************************************************************************************/
@@ -51,7 +51,7 @@ void MCP7940M_set_seconds(uint8_t seconds);
   	 \param[in] minutes in uint8_t format
   	 \return void
   */
-void MCP7940M_set_minutes(uint8_t minutes);
+uint8_t MCP7940M_set_minutes(uint8_t minutes);
 
 /********************************************************************************************/
  /********************************************************************************************/
@@ -63,7 +63,7 @@ void MCP7940M_set_minutes(uint8_t minutes);
   	 \param[in] hours in uint8_t format
   	 \return void
   */
-void MCP7940M_set_hours(uint8_t hours);
+uint8_t MCP7940M_set_hours(uint8_t hours);
 
 /********************************************************************************************/
  /********************************************************************************************/
@@ -115,7 +115,7 @@ uint8_t MCP7940M_get_hours(void);
   	 	 	 	 year in uint8_t format
   	 \return void
   */
-void MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year);
+uint8_t MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year);
 
 /********************************************************************************************/
  /********************************************************************************************/
@@ -127,7 +127,7 @@ void MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year);
   	 \param[in] day in uint8_t format
   	 \return void
   */
-void MCP7940M_set_month(uint8_t month);
+uint8_t MCP7940M_set_month(uint8_t month);
 
 /********************************************************************************************/
  /********************************************************************************************/
@@ -139,7 +139,7 @@ void MCP7940M_set_month(uint8_t month);
   	 \param[in] day in uint8_t format
   	 \return void
   */
-void MCP7940M_set_year(uint8_t year);
+uint8_t MCP7940M_set_year(uint8_t year);
 
 /********************************************************************************************/
  /********************************************************************************************/

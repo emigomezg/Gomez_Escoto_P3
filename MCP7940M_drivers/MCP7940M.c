@@ -16,7 +16,7 @@ static const uint8_t day_memory = 0x04;
 static const uint8_t month_memory = 0x05;
 static const uint8_t year_memory = 0x06;
 
-void MCP7940M_set_seconds(uint8_t seconds)
+uint8_t MCP7940M_set_seconds(uint8_t seconds)
 {
 	if(seconds>=0 &&  seconds<60){
 		seconds = ((seconds / 10) << 4) | (seconds % 10);
@@ -35,12 +35,16 @@ void MCP7940M_set_seconds(uint8_t seconds)
 		I2C_get_ack(I2C_0);//reads acknowledge
 
 		I2C_stop(I2C_0);//sends nack and stop comunications
+		return TRUE;
 	}
+	else
+		return FALSE;
 }
 
-void MCP7940M_set_minutes(uint8_t minutes)
+uint8_t MCP7940M_set_minutes(uint8_t minutes)
 {
-	if(minutes>=0 &&  minutes<60){
+	if(minutes>=0 &&  minutes<60)
+	{
 		minutes =((minutes / 10) << 4) | (minutes % 10);
 		I2C_start(I2C_0);//sends start bit
 		I2C_write_byte(I2C_0, MCP7940M_WRITE_ADD);//writes the direction of RTC with the write bit enable
@@ -56,10 +60,13 @@ void MCP7940M_set_minutes(uint8_t minutes)
 		I2C_get_ack(I2C_0);//reads acknowledge
 
 		I2C_stop(I2C_0);//sends nack and stop comunications
+		return TRUE;
 	}
+	else
+		return FALSE;
 }
 
-void MCP7940M_set_hours(uint8_t hours)
+uint8_t MCP7940M_set_hours(uint8_t hours)
 {
 	if(hours>=0 &&  hours<24){
 		hours =((hours / 10) << 4) | (hours % 10);
@@ -77,7 +84,10 @@ void MCP7940M_set_hours(uint8_t hours)
 		I2C_get_ack(I2C_0);//reads acknowledge
 
 		I2C_stop(I2C_0);//sends nack and stop comunications
+		return TRUE;
 	}
+	else
+		return FALSE;
 }
 
 uint8_t MCP7940M_get_seconds(void)
@@ -166,7 +176,7 @@ uint8_t MCP7940M_get_hours(void)
 	 return  ((data & 0xF0) >> 4) * 10 + (data & 0x0F);
 }
 
-void MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year)
+uint8_t MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year)
 {
 	uint8_t day_limit = 0;
 	/*Month of input date is validated*/
@@ -260,10 +270,13 @@ void MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year)
 			}
 		MCP7940M_set_month(month);
 		MCP7940M_set_year(year);
+		return TRUE;
 	}
+	else
+		return FALSE;
 }
 
-void MCP7940M_set_month(uint8_t month)
+uint8_t MCP7940M_set_month(uint8_t month)
 {
 	if(month>=1 &&  month<13)
 	{
@@ -282,10 +295,13 @@ void MCP7940M_set_month(uint8_t month)
 		I2C_get_ack(I2C_0);//reads acknowledge
 
 		I2C_stop(I2C_0);//sends nack and stop comunications
+		return TRUE;
 	}
+	else
+		return FALSE;
 }
 
-void MCP7940M_set_year(uint8_t year)
+uint8_t MCP7940M_set_year(uint8_t year)
 {
 	if(year>=1 &&  year<99)
 	{
@@ -304,7 +320,10 @@ void MCP7940M_set_year(uint8_t year)
 		I2C_get_ack(I2C_0);//reads acknowledge
 
 		I2C_stop(I2C_0);//sends nack and stop comunications
+		return TRUE;
 	}
+	else
+		return FALSE;
 }
 
 uint8_t MCP7940M_get_day(void)
