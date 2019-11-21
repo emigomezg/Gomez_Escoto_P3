@@ -27,11 +27,11 @@ typedef enum{
 }fifo_types_t;
 
 
-fifo_status_t FIFO_init(fifos_t * fifo,uint8_t size);
-uint8_t FIFO_push(fifos_t * fifo,uint8_t data);
-uint8_t FIFO_POP(fifos_t * fifo);
-uint8_t FIFO_isEmpty(fifos_t * fifo);
-uint8_t FIFO_getStatus(fifos_t * fifo);
+fifo_status_t FIFO_init(volatile fifos_t * fifo,uint8_t size);
+uint8_t FIFO_push(volatile fifos_t * fifo,uint8_t data);
+uint8_t FIFO_POP(volatile fifos_t * fifo);
+uint8_t FIFO_isEmpty(volatile fifos_t * fifo);
+uint8_t FIFO_getStatus(volatile fifos_t * fifo);
 
 
 #endif /* FIFO_H_ */

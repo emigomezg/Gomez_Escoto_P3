@@ -12,11 +12,15 @@
 #include <source/fifo.h>
 #include <source/drivers/UART.h>
 #include <source/MCP7940M_drivers/MCP7940M.h>
+#include <source/adafruit/LETTERS_NUMS.h>
+#include <source/adafruit/ht16k33.h>
+#include <source/adafruit/screen.h>
 
-#define TIME_FIFO_SIZE 8
+
+#define DTIME_FIFO_SIZE 8
 
 typedef enum{
-	DTIME_TERMINAL0,DTIME_TERMINAL1
+	DTIME_TERMINAL1,DTIME_TERMINAL2
 }dtime_profil_t;
 
 void DISP_TIME_display(dtime_profil_t terminal);

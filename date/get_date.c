@@ -16,7 +16,7 @@ static int8_t clean_screen_all[] = { "\033[1J" };
 //static int8_t green_text_red_char_background[] = { "\033[0;32;41m" };
 static int8_t red_back_yellow[] = { "\033[0;35;43m" };/** VT100 command for text in red and background in cyan*/
 static int8_t title_pos[] = { "\033[10:10H" };
-static int8_t title[] = { "\tget Datee\r" };
+static int8_t title[] = { "\tget Date\r" };
 static int8_t chat_menu_pos[] = { "\033[15:10H" };
 static int8_t chat[] = { "current time time is: " };
 static int8_t ret_pos[] = { "\033[16:10H" };
@@ -33,7 +33,7 @@ void GET_DATE_display(gdate_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GDATE_TERMINAL0:
+		case GDATE_TERMINAL1:
 			if (FIFO_init(&date0, DATE_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_0, &clean_screen_all[0]);
 				UART_put_string(UART_0, &clean_screen[0]);
@@ -66,7 +66,7 @@ void GET_DATE_display(gdate_profil_t terminal)
 				get_date0_exit_flag = FALSE;
 			}
 		break;
-		case GDATE_TERMINAL1:
+		case GDATE_TERMINAL2:
 			if (FIFO_init(&date1, DATE_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_1, &clean_screen_all[0]);
 				UART_put_string(UART_1, &clean_screen[0]);
@@ -116,7 +116,7 @@ FIFO_push(&date0, (month % 10) + '0');
 FIFO_push(&date0, '/');
 FIFO_push(&date0, (year / 10) + '0');
 FIFO_push(&date0, (year % 10) + '0');
-	GET_DATE_send_to_UART(GDATE_TERMINAL0);
+	GET_DATE_send_to_UART(GDATE_TERMINAL1);
 	PIT_disable_timer(PIT_1);
 
 }
@@ -133,7 +133,7 @@ void GET_DATE1_PIT_handler(void)
 	FIFO_push(&date1, '/');
 	FIFO_push(&date1, (year / 10) + '0');
 	FIFO_push(&date1, (year % 10) + '0');
-	GET_DATE_send_to_UART(GDATE_TERMINAL1);
+	GET_DATE_send_to_UART(GDATE_TERMINAL2);
 	PIT_disable_timer(PIT_2);
 
 }
@@ -142,14 +142,14 @@ void GET_DATE_send_to_UART(gdate_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GDATE_TERMINAL0:
+		case GDATE_TERMINAL1:
 			UART_put_string(UART_0, &ret_pos[0]);
 			while (date0.status != FIFO_EMPTY) {
 				UART_put_char(UART_0, FIFO_POP(&date0));
 			}
 
 		break;
-		case GDATE_TERMINAL1:
+		case GDATE_TERMINAL2:
 			UART_put_string(UART_1, &ret_pos[0]);
 			while (date1.status != FIFO_EMPTY) {
 				UART_put_char(UART_1, FIFO_POP(&date1));
@@ -178,11 +178,11 @@ uint8_t GET_DATE_get_exit_flag(gdate_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GDATE_TERMINAL0:
+		case GDATE_TERMINAL1:
 			if (get_date0_exit_flag) PIT_disable_timer(PIT_1);
 			return get_date0_exit_flag;
 		break;
-		case GDATE_TERMINAL1:
+		case GDATE_TERMINAL2:
 			if (get_date1_exit_flag) PIT_disable_timer(PIT_2);
 			return get_date1_exit_flag;
 		break;
@@ -196,11 +196,11 @@ void GET_DATE_clean_exit_flag(gdate_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GDATE_TERMINAL0:
+		case GDATE_TERMINAL1:
 
 			 get_date0_exit_flag=FALSE;
 		break;
-		case GDATE_TERMINAL1:
+		case GDATE_TERMINAL2:
 			 get_date1_exit_flag =FALSE;
 		break;
 		default:

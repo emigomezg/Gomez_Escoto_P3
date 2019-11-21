@@ -17,7 +17,7 @@
 #define DATE_FIFO_SIZE 8
 
 typedef enum{
-	GDATE_TERMINAL0,GDATE_TERMINAL1
+	GDATE_TERMINAL1,GDATE_TERMINAL2
 }gdate_profil_t;
 
 void GET_DATE_display(gdate_profil_t terminal);

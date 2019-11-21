@@ -22,6 +22,7 @@
 #include "drivers/GPIO.h"
 
 #include "time/set_time.h"
+#include "time/disp_time.h"
 #include "date/set_date.h"
 
 #include "time/get_time.h"
@@ -37,14 +38,14 @@ typedef enum{
 }pms_states_t;
 
 typedef struct {
-	uint8_t current_state;
-	uint8_t change_state;
-	uint8_t exit_state;
+	 uint8_t current_state;
+	 uint8_t change_state;
+	 uint8_t exit_state;
 }state_machine_t;
 
 typedef enum{
-	TERMINAL0,
-	TERMINAL1
+	TERMINAL1,
+	TERMINAL2
 }terminals;
 
 
@@ -57,10 +58,6 @@ typedef struct{
 		uint8_t in_use_set_msg_f;
 	}in_use_flags_t;
 
-
-
-
-
 void PSM_INIT(void);
 
 uint8_t PSM_GET_CHANGE(terminals state);
@@ -70,5 +67,6 @@ void PSM_CLEAN_CHANGE(terminals state);
 void PSM_main_menu(terminals ter);
 
 void PSM0_STATE_MENU(void);
+void PSM1_STATE_MENU(void);
 
 #endif /* PSM_H_ */

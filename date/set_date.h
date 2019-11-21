@@ -16,7 +16,7 @@
 #define DATE_FIFO_SIZE 8
 
 typedef enum{
-	DATE_TERMINAL0,DATE_TERMINAL1
+	DATE_TERMINAL1,DATE_TERMINAL2
 }date_profil_t;
 
 

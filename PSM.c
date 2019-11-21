@@ -44,7 +44,7 @@ void PSM_main_menu(terminals ter)
 {
 	switch ((uint8_t) ter)
 	{
-		case TERMINAL0:
+		case TERMINAL1:
 			UART_put_string(UART_0, &clean_screen_all[0]);
 			UART_put_string(UART_0, &clean_screen[0]);
 			UART_put_string(UART_0, &red_back_yellow[0]);
@@ -68,7 +68,7 @@ void PSM_main_menu(terminals ter)
 			UART_put_string(UART_0, &get_date_menu_pos[0]);
 			UART_put_string(UART_0, &get_date[0]);
 		break;
-		case TERMINAL1:
+		case TERMINAL2:
 			UART_put_string(UART_1, &clean_screen_all[0]);
 			UART_put_string(UART_1, &clean_screen[0]);
 			UART_put_string(UART_1, &red_back_yellow[0]);
@@ -132,16 +132,16 @@ uint8_t PSM_GET_CHANGE(terminals state)
 {
 	switch ((uint8_t) state)
 	{
-		case TERMINAL0:
+		case TERMINAL1:
 			switch (g_terminal1.current_state)
 			{
 				case ST_CHAT:
 				break;
 				case ST_SET_HOUR:
 					//g_terminal1.change_state = TRUE;
-					g_terminal1.exit_state = SET_TIME_get_exit_flag(TIME_TERMINAL0);
+					g_terminal1.exit_state = SET_TIME_get_exit_flag(TIME_TERMINAL1);
 					if (g_terminal1.exit_state) {
-						SET_TIME_clean_exit_flag(TIME_TERMINAL0);
+						SET_TIME_clean_exit_flag(TIME_TERMINAL1);
 						g_terminal1.current_state = ST_MENU;
 						g_flags.in_use_set_time_f = FALSE;
 						g_terminal1.change_state = TRUE;
@@ -150,39 +150,51 @@ uint8_t PSM_GET_CHANGE(terminals state)
 				break;
 				case ST_SET_DATE:
 					//g_terminal1.change_state = TRUE;
-					g_terminal1.exit_state = SET_DATE_get_exit_flag(DATE_TERMINAL0);
+					g_terminal1.exit_state = SET_DATE_get_exit_flag(DATE_TERMINAL1);
 					if (g_terminal1.exit_state) {
-						SET_DATE_clean_exit_flag(DATE_TERMINAL0);
+						SET_DATE_clean_exit_flag(DATE_TERMINAL1);
 						g_terminal1.current_state = ST_MENU;
 						g_flags.in_use_set_date_f = FALSE;
 						g_terminal1.change_state = TRUE;
 					}
 				break;
 				case ST_READ_HOUR:
-					g_terminal1.exit_state = GET_TIME_get_exit_flag(GTIME_TERMINAL0);
+					g_terminal1.exit_state = GET_TIME_get_exit_flag(GTIME_TERMINAL1);
 					if (g_terminal1.exit_state) {
-						GET_TIME_clean_exit_flag(GTIME_TERMINAL0);
+						GET_TIME_clean_exit_flag(GTIME_TERMINAL1);
 						g_terminal1.current_state = ST_MENU;
 						g_terminal1.change_state = TRUE;
 					}
 				break;
 				case ST_DISP_HOUR_MAT:
+					g_terminal1.exit_state = DISP_TIME_get_exit_flag(DTIME_TERMINAL1);
+					if (g_terminal1.exit_state) {
+						DISP_TIME_clean_exit_flag(DTIME_TERMINAL1);
+						g_terminal1.current_state = ST_MENU;
+						g_terminal1.change_state = TRUE;
+					}
 				break;
 				case ST_SET_MSG:
-					g_terminal1.exit_state = SET_MSG_get_exit_flag(MSG_TERMINAL0);
+					g_terminal1.exit_state = SET_MSG_get_exit_flag(MSG_TERMINAL1);
 					if (g_terminal1.exit_state) {
-						SET_MSG_clean_exit_flag(MSG_TERMINAL0);
+						SET_MSG_clean_exit_flag(MSG_TERMINAL1);
 						g_terminal1.current_state = ST_MENU;
 						g_flags.in_use_set_msg_f = FALSE;
 						g_terminal1.change_state = TRUE;
 					}
 				break;
 				case ST_DISP_MSG:
+					g_terminal1.exit_state = GET_MSG_get_exit_flag(GMSG_TERMINAL1);
+					if (g_terminal1.exit_state) {
+						GET_MSG_clean_exit_flag(GMSG_TERMINAL1);
+						g_terminal1.current_state = ST_MENU;
+						g_terminal1.change_state = TRUE;
+					}
 				break;
 				case ST_READ_DATE:
-					g_terminal1.exit_state = GET_DATE_get_exit_flag(GDATE_TERMINAL0);
+					g_terminal1.exit_state = GET_DATE_get_exit_flag(GDATE_TERMINAL1);
 					if (g_terminal1.exit_state) {
-						GET_DATE_clean_exit_flag(GDATE_TERMINAL0);
+						GET_DATE_clean_exit_flag(GDATE_TERMINAL1);
 						g_terminal1.current_state = ST_MENU;
 						g_terminal1.change_state = TRUE;
 					}
@@ -193,23 +205,93 @@ uint8_t PSM_GET_CHANGE(terminals state)
 			}
 			return g_terminal1.change_state;
 		break;
-		case TERMINAL1:
+		case TERMINAL2:
+			switch (g_terminal2.current_state)
+			{
+				case ST_CHAT:
+				break;
+				case ST_SET_HOUR:
+					//g_terminal1.change_state = TRUE;
+					g_terminal2.exit_state = SET_TIME_get_exit_flag(TIME_TERMINAL2);
+					if (g_terminal2.exit_state) {
+						SET_TIME_clean_exit_flag(TIME_TERMINAL2);
+						g_terminal2.current_state = ST_MENU;
+						g_flags.in_use_set_time_f = FALSE;
+						g_terminal2.change_state = TRUE;
+
+					}
+				break;
+				case ST_SET_DATE:
+					//g_terminal1.change_state = TRUE;
+					g_terminal2.exit_state = SET_DATE_get_exit_flag(DATE_TERMINAL2);
+					if (g_terminal2.exit_state) {
+						SET_DATE_clean_exit_flag(DATE_TERMINAL2);
+						g_terminal2.current_state = ST_MENU;
+						g_flags.in_use_set_date_f = FALSE;
+						g_terminal2.change_state = TRUE;
+					}
+				break;
+				case ST_READ_HOUR:
+					g_terminal2.exit_state = GET_TIME_get_exit_flag(GTIME_TERMINAL2);
+					if (g_terminal2.exit_state) {
+						GET_TIME_clean_exit_flag(GTIME_TERMINAL2);
+						g_terminal2.current_state = ST_MENU;
+						g_terminal2.change_state = TRUE;
+					}
+				break;
+				case ST_DISP_HOUR_MAT:
+					g_terminal2.exit_state = DISP_TIME_get_exit_flag(DTIME_TERMINAL2);
+					if (g_terminal2.exit_state) {
+						DISP_TIME_clean_exit_flag(DTIME_TERMINAL2);
+						g_terminal2.current_state = ST_MENU;
+						g_terminal2.change_state = TRUE;
+					}
+				break;
+				case ST_SET_MSG:
+					g_terminal2.exit_state = SET_MSG_get_exit_flag(MSG_TERMINAL2);
+					if (g_terminal2.exit_state) {
+						SET_MSG_clean_exit_flag(MSG_TERMINAL2);
+						g_terminal2.current_state = ST_MENU;
+						g_flags.in_use_set_msg_f = FALSE;
+						g_terminal2.change_state = TRUE;
+					}
+				break;
+				case ST_DISP_MSG:
+					g_terminal2.exit_state = GET_MSG_get_exit_flag(GMSG_TERMINAL2);
+					if (g_terminal2.exit_state) {
+						GET_MSG_clean_exit_flag(GMSG_TERMINAL2);
+						g_terminal2.current_state = ST_MENU;
+						g_terminal2.change_state = TRUE;
+					}
+				break;
+				case ST_READ_DATE:
+					g_terminal2.exit_state = GET_DATE_get_exit_flag(GDATE_TERMINAL2);
+					if (g_terminal2.exit_state) {
+						GET_DATE_clean_exit_flag(GDATE_TERMINAL2);
+						g_terminal2.current_state = ST_MENU;
+						g_terminal2.change_state = TRUE;
+					}
+
+				break;
+				default:
+				break;
+			}
 			return g_terminal2.change_state;
 		break;
 		default:
 		break;
 	}
-	return 0;
+	return FALSE;
 }
 void PSM_STM(uint8_t state)
 {
-	switch ((uint8_t) state)
+	switch (state)
 	{
-		case TERMINAL0:
-			switch ((uint8_t) g_terminal1.current_state)
+		case TERMINAL1:
+			switch (g_terminal1.current_state)
 			{
 				case ST_MENU:
-					PSM_main_menu(TERMINAL0);
+					PSM_main_menu(TERMINAL1);
 					UART_callback_init(PSM0_STATE_MENU, UART_0);
 				break;
 				case ST_CHAT:
@@ -219,70 +301,100 @@ void PSM_STM(uint8_t state)
 				case ST_SET_HOUR:
 					if (!g_flags.in_use_set_time_f) {
 						g_flags.in_use_set_time_f = TRUE;
-						SET_TIME_display(TIME_TERMINAL0);
+						SET_TIME_display(TIME_TERMINAL1);
 						UART_callback_init(SET_TIME_uart0_handler, UART_0);
 					}
 				break;
 				case ST_SET_DATE:
 					if (!g_flags.in_use_set_date_f) {
 						g_flags.in_use_set_date_f = TRUE;
-						SET_DATE_display(DATE_TERMINAL0);
+						SET_DATE_display(DATE_TERMINAL1);
 						UART_callback_init(SET_DATE_uart0_handler, UART_0);
 					}
 				break;
 				case ST_READ_HOUR:
-					GET_TIME_display(TIME_TERMINAL0);
+					GET_TIME_display(TIME_TERMINAL1);
 					UART_callback_init(GET_TIME_uart0_handler, UART_0);
 				break;
 				case ST_DISP_HOUR_MAT:
+					DISP_TIME_display(DTIME_TERMINAL1);
+					UART_callback_init(DISP_TIME_uart0_handler, UART_0);
 				break;
 				case ST_SET_MSG:
 					if (!g_flags.in_use_set_time_f) {
 						g_flags.in_use_set_msg_f = TRUE;
-						SET_MSG_display(MSG_TERMINAL0);
+						SET_MSG_display(MSG_TERMINAL1);
 						UART_callback_init(SET_MSG_uart0_handler, UART_0);
 					}
 				break;
 				case ST_DISP_MSG:
+					GET_MSG_display(GMSG_TERMINAL1);
+					UART_callback_init(GET_MSG_uart0_handler, UART_0);
 				break;
 				case ST_READ_DATE:
-					GET_DATE_display(DATE_TERMINAL0);
+					GET_DATE_display(DATE_TERMINAL1);
 					UART_callback_init(GET_DATE_uart0_handler, UART_0);
 				break;
 				default:
 				break;
 
 			}
-			PSM_CLEAN_CHANGE(TERMINAL0);
+			PSM_CLEAN_CHANGE(TERMINAL1);
 		break;
-		case TERMINAL1:
-			switch ((uint8_t) g_terminal2.current_state)
+		case TERMINAL2:
+			switch (g_terminal2.current_state)
 			{
 				case ST_MENU:
-					PSM_main_menu(TERMINAL1);
+					PSM_main_menu(TERMINAL2);
+					UART_callback_init(PSM1_STATE_MENU, UART_1);
 				break;
 				case ST_CHAT:
-					g_flags.uart0_active_f = TRUE;
+					g_flags.uart1_active_f = TRUE;
+
 				break;
 				case ST_SET_HOUR:
-					g_flags.in_use_set_time_f = TRUE;
+					if (!g_flags.in_use_set_time_f) {
+						g_flags.in_use_set_time_f = TRUE;
+						SET_TIME_display(TIME_TERMINAL2);
+						UART_callback_init(SET_TIME_uart1_handler, UART_1);
+					}
 				break;
 				case ST_SET_DATE:
-					g_flags.in_use_set_date_f = TRUE;
+					if (!g_flags.in_use_set_date_f) {
+						g_flags.in_use_set_date_f = TRUE;
+						SET_DATE_display(DATE_TERMINAL2);
+						UART_callback_init(SET_DATE_uart1_handler, UART_1);
+					}
 				break;
 				case ST_READ_HOUR:
+					GET_TIME_display(TIME_TERMINAL2);
+					UART_callback_init(GET_TIME_uart1_handler, UART_1);
 				break;
 				case ST_DISP_HOUR_MAT:
+					DISP_TIME_display(DTIME_TERMINAL2);
+					UART_callback_init(DISP_TIME_uart1_handler, UART_1);
 				break;
 				case ST_SET_MSG:
+					if (!g_flags.in_use_set_time_f) {
+						g_flags.in_use_set_msg_f = TRUE;
+						SET_MSG_display(MSG_TERMINAL2);
+						UART_callback_init(SET_MSG_uart1_handler, UART_1);
+					}
 				break;
 				case ST_DISP_MSG:
+					GET_MSG_display(GMSG_TERMINAL2);
+					UART_callback_init(GET_MSG_uart1_handler, UART_1);
 				break;
 				case ST_READ_DATE:
+					GET_DATE_display(DATE_TERMINAL2);
+					UART_callback_init(GET_DATE_uart1_handler, UART_1);
 				break;
 				default:
 				break;
+
 			}
+			PSM_CLEAN_CHANGE(TERMINAL2);
+		break;
 		break;
 		default:
 		break;
@@ -295,10 +407,10 @@ void PSM_CLEAN_CHANGE(terminals state)
 {
 	switch ((uint8_t) state)
 	{
-		case TERMINAL0:
+		case TERMINAL1:
 			g_terminal1.change_state = FALSE;
 		break;
-		case TERMINAL1:
+		case TERMINAL2:
 			g_terminal2.change_state = FALSE;
 		break;
 	}
@@ -328,7 +440,6 @@ void PSM0_STATE_MENU(void)
 		break;
 		case '7':
 			g_terminal1.current_state = ST_DISP_MSG;
-			;
 		break;
 		case '8':
 			g_terminal1.current_state = ST_READ_DATE;
@@ -340,11 +451,53 @@ void PSM0_STATE_MENU(void)
 	g_terminal1.change_state = TRUE;
 
 }
+void PSM1_STATE_MENU(void)
+{
+	switch (UART_get_mailbox(UART_1))
+	{
+		case '1':
+			g_terminal2.current_state = ST_CHAT;
+		break;
+		case '2':
+			g_terminal2.current_state = ST_SET_HOUR;
+		break;
+		case '3':
+			g_terminal2.current_state = ST_SET_DATE;
+		break;
+		case '4':
+			g_terminal2.current_state = ST_READ_HOUR;
+		break;
+		case '5':
+			g_terminal2.current_state = ST_DISP_HOUR_MAT;
+		break;
+		case '6':
+			g_terminal2.current_state = ST_SET_MSG;
+		break;
+		case '7':
+			g_terminal2.current_state = ST_DISP_MSG;
+		break;
+		case '8':
+			g_terminal2.current_state = ST_READ_DATE;
+		break;
+		default:
+		break;
+
+	}
+	g_terminal2.change_state = TRUE;
+
+}
 
 void PSM_INIT(void)
 {
 	PSM_UARTS_setting();
 	I2C_init(I2C_0, CLK_K64, baud_rate);
+	HT16k33_init();
+	screen_clear_data();
+	screen_send_array_2mat();
+	M24LC256_fill_memory_With('\0');
+	M24LC256_fill_memory_With('\0');
+	M24LC256_fill_memory_With('\0');
+
 	g_terminal1.current_state = ST_MENU;
 	g_terminal2.current_state = ST_MENU;
 	g_terminal1.change_state = TRUE;

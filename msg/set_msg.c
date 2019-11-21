@@ -19,25 +19,30 @@ static int8_t return_status_pos[] = { "\033[13:10H" };
 static int8_t return_status[] = { "message change was:\t" };
 static int8_t unsucc[] = { "Unsuccessful\n\r" };
 static int8_t succ[] = { "successful\n\r" };
-static int8_t press_any_key_pos[] = { "\033[15:10H" };
 static int8_t press_any_key[] = { "press any key to continue....\n\r" };
 static int8_t selected[] = { "[SELECTED]\n\r" };
-
 
 static volatile uint8_t set_msg0_exit_flag = FALSE;
 static volatile uint8_t set_msg1_exit_flag = FALSE;
 
-static volatile uint8_t msg_select_f = FALSE;
+static volatile uint8_t msg_select1_f = FALSE;
+static volatile uint8_t msg_select2_f = FALSE;
 
-static fifos_t msg1, msg2,msg3,msg4,msg5;
+static fifos_t msg1, msg2, msg3, msg4, msg5;
+
+static uint8_t g_limit_reached = FALSE;
 
 void SET_MSG_display(msg_profil_t terminal)
 {
-
+	g_limit_reached = FALSE;
 	switch ((uint8_t) terminal)
 	{
-		case MSG_TERMINAL0:
+		case MSG_TERMINAL1:
 			if (FIFO_init(&msg1, MSG_FIFO_SIZE) == FIFO_SUCCESS) {
+				FIFO_init(&msg2, MSG_FIFO_SIZE);
+				FIFO_init(&msg3, MSG_FIFO_SIZE);
+				FIFO_init(&msg4, MSG_FIFO_SIZE);
+				FIFO_init(&msg5, MSG_FIFO_SIZE);
 				UART_put_string(UART_0, &clean_screen_all[0]);
 				UART_put_string(UART_0, &clean_screen[0]);
 				UART_put_string(UART_0, &red_back_yellow[0]);
@@ -46,7 +51,7 @@ void SET_MSG_display(msg_profil_t terminal)
 				UART_put_string(UART_0, &chat_menu_pos[0]);
 				UART_put_string(UART_0, &chat[0]);
 				set_msg0_exit_flag = FALSE;
-				msg_select_f = FALSE;
+				msg_select1_f = FALSE;
 			} else {
 				UART_put_string(UART_0, &clean_screen_all[0]);
 				UART_put_string(UART_0, &clean_screen[0]);
@@ -56,11 +61,15 @@ void SET_MSG_display(msg_profil_t terminal)
 				UART_put_string(UART_0, &return_status[0]);
 				UART_put_string(UART_0, &unsucc[0]);
 				set_msg0_exit_flag = FALSE;
-				msg_select_f = FALSE;
+				msg_select1_f = FALSE;
 			}
 		break;
-		case MSG_TERMINAL1:
+		case MSG_TERMINAL2:
 			if (FIFO_init(&msg1, MSG_FIFO_SIZE) == FIFO_SUCCESS) {
+				FIFO_init(&msg2, MSG_FIFO_SIZE);
+				FIFO_init(&msg3, MSG_FIFO_SIZE);
+				FIFO_init(&msg4, MSG_FIFO_SIZE);
+				FIFO_init(&msg5, MSG_FIFO_SIZE);
 				UART_put_string(UART_1, &clean_screen_all[0]);
 				UART_put_string(UART_1, &clean_screen[0]);
 				UART_put_string(UART_1, &red_back_yellow[0]);
@@ -69,18 +78,19 @@ void SET_MSG_display(msg_profil_t terminal)
 				UART_put_string(UART_1, &chat_menu_pos[0]);
 				UART_put_string(UART_1, &chat[0]);
 				set_msg1_exit_flag = FALSE;
-				msg_select_f=FALSE;
+				msg_select2_f = FALSE;
 			} else {
-				UART_put_string(UART_1, &clean_screen_all[0]);
-				UART_put_string(UART_1, &clean_screen[0]);
-				UART_put_string(UART_1, &red_back_yellow[0]);
-				UART_put_string(UART_1, &return_status_pos[0]);
+				UART_put_string(UART_0, &clean_screen_all[0]);
+				UART_put_string(UART_0, &clean_screen[0]);
+				UART_put_string(UART_0, &red_back_yellow[0]);
+				UART_put_string(UART_0, &return_status_pos[0]);
 
-				UART_put_string(UART_1, &return_status[0]);
-				UART_put_string(UART_1, &unsucc[0]);
+				UART_put_string(UART_0, &return_status[0]);
+				UART_put_string(UART_0, &unsucc[0]);
 				set_msg1_exit_flag = FALSE;
-				msg_select_f =FALSE;
+				msg_select2_f = FALSE;
 			}
+
 		break;
 
 	}
@@ -90,121 +100,269 @@ void SET_MSG_uart0_handler(void)
 {
 	static volatile uint8_t wait_flag = FALSE;
 	//static volatile uint8_t err_flag = FALSE;
-
 	static volatile uint8_t msg_2_change = 0x00;
 	uint8_t data_recived = UART_get_mailbox(UART_0);
 	if (wait_flag == TRUE) {
 		set_msg0_exit_flag = TRUE;
 		wait_flag = FALSE;
-	}
-	if (data_recived != '\e' && data_recived != '\r') {
-		if(!msg_select_f){
-			UART_put_char(UART_0, data_recived);
-			UART_put_string(UART_0, &selected[0]);
-			UART_put_char(UART_0, '\r');
-			UART_put_char(UART_0, '\n');
-			msg_2_change = data_recived;
-			msg_select_f = TRUE;
-		}else
-		{
-			switch(msg_2_change)
+		msg_2_change = 0x00;
+	} else if (data_recived != '\e' && data_recived != '\r') {
+		if (!msg_select1_f) {
+			if (data_recived > '0' && data_recived <= '5') {
+				UART_put_char(UART_0, data_recived);
+				UART_put_string(UART_0, &selected[0]);
+				UART_put_char(UART_0, '\r');
+				UART_put_char(UART_0, '\n');
+				msg_2_change = data_recived;
+				msg_select1_f = TRUE;
+			}
+		} else {
+			switch (msg_2_change)
 			{
 				case MSG_1:
-					FIFO_push(&msg1, data_recived);
-					break;
+					if (FIFO_push(&msg1, data_recived) == FIFO_FULL)
+						g_limit_reached = TRUE;
+				break;
 				case MSG_2:
-					FIFO_push(&msg2, data_recived);
-					break;
+					if (FIFO_push(&msg2 , data_recived) == FIFO_FULL)
+						g_limit_reached = TRUE;
+				break;
 				case MSG_3:
-					FIFO_push(&msg3, data_recived);
-					break;
+					if (FIFO_push(&msg3 , data_recived) == FIFO_FULL)
+						g_limit_reached = TRUE;
+				break;
 				case MSG_4:
-					FIFO_push(&msg4, data_recived);
-					break;
+					if (FIFO_push(&msg4 , data_recived) == FIFO_FULL)
+						g_limit_reached = TRUE;
+				break;
 				case MSG_5:
-					FIFO_push(&msg5, data_recived);
-					break;
+					if (FIFO_push(&msg5 , data_recived) == FIFO_FULL)
+						g_limit_reached = TRUE;
+				break;
 				default:
-					break;
+				break;
 
 			}
 			UART_put_char(UART_0, data_recived);
 		}
 
-	} else if (data_recived == '\r'&& msg_select_f!=FALSE) {
-		uint8_t err;
-		switch(msg_2_change)
+	}
+	if ((data_recived == '\r' && msg_select1_f != FALSE && wait_flag == FALSE) || g_limit_reached == TRUE) {
+		uint8_t err = 0x00;
+		switch (msg_2_change)
 		{
 			case MSG_1:
-				for(uint8_t a = 0; FIFO_EMPTY!=msg1.status;a++){
-					err = M24LC256_Write_random(FIFO_POP(&msg1), MSG1_MEM+a);
-				}
-				UART_put_char(UART_0,'\n');
-				UART_put_char(UART_0,'\r');
+				M24LC256_write_sequential(&msg1.data[0], msg1.max_size + 1, MSG1_MEM);
+				UART_put_char(UART_0, '\n');
+				UART_put_char(UART_0, '\r');
 				UART_put_string(UART_0, &return_status[0]);
-				if(!err){
+				if (!err) {
 					UART_put_string(UART_0, &succ[0]);
-				}else{
+				} else {
 					UART_put_string(UART_0, &unsucc[0]);
 				}
 				UART_put_string(UART_0, &press_any_key[0]);
 				wait_flag = TRUE;
-				break;
+			break;
 			case MSG_2:
-				break;
+				M24LC256_write_sequential(&msg2.data[0], msg2.max_size + 1, MSG2_MEM);
+				UART_put_char(UART_0, '\n');
+				UART_put_char(UART_0, '\r');
+				UART_put_string(UART_0, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_0, &succ[0]);
+				} else {
+					UART_put_string(UART_0, &unsucc[0]);
+				}
+				UART_put_string(UART_0, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
 			case MSG_3:
-				break;
+				M24LC256_write_sequential(&msg3.data[0], msg3.max_size + 1, MSG3_MEM);
+				UART_put_char(UART_0, '\n');
+				UART_put_char(UART_0, '\r');
+				UART_put_string(UART_0, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_0, &succ[0]);
+				} else {
+					UART_put_string(UART_0, &unsucc[0]);
+				}
+				UART_put_string(UART_0, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
 			case MSG_4:
-				break;
+				M24LC256_write_sequential(&msg4.data[0], msg4.max_size + 1, MSG4_MEM);
+				UART_put_char(UART_0, '\n');
+				UART_put_char(UART_0, '\r');
+				UART_put_string(UART_0, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_0, &succ[0]);
+				} else {
+					UART_put_string(UART_0, &unsucc[0]);
+				}
+				UART_put_string(UART_0, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
 			case MSG_5:
-				break;
+				M24LC256_write_sequential(&msg5.data[0], msg5.max_size + 1, MSG5_MEM);
+				UART_put_char(UART_0, '\n');
+				UART_put_char(UART_0, '\r');
+				UART_put_string(UART_0, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_0, &succ[0]);
+				} else {
+					UART_put_string(UART_0, &unsucc[0]);
+				}
+				UART_put_string(UART_0, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
 			default:
-				break;
+			break;
 
 		}
 	} else if (data_recived == '\e') {
 		set_msg0_exit_flag = TRUE;
-	} else if (msg1.status == FIFO_FULL) {
-
-			/*err_flag = MCP7940M_set_seconds(seconds);
-			MCP7940M_set_minutes(minutes);
-			MCP7940M_set_hours(hours);
-			if (err_flag) {
-				UART_put_string(UART_0, &return_status_pos[0]);
-				UART_put_string(UART_0, &return_status[0]);
-				UART_put_string(UART_0, &succ[0]);
-				err_flag = FALSE;
-			} else {
-				UART_put_string(UART_0, &return_status_pos[0]);
-				UART_put_string(UART_0, &return_status[0]);
-				UART_put_string(UART_0, &unsucc[0]);
-				err_flag = FALSE;
-			}
-		} else {
-			UART_put_string(UART_0, &return_status_pos[0]);
-			UART_put_string(UART_0, &return_status[0]);
-			UART_put_string(UART_0, &unsucc[0]);
-		}*/
-		wait_flag = TRUE;
-		UART_put_string(UART_0, &press_any_key_pos[0]);
-		UART_put_string(UART_0, &press_any_key[0]);
-
 	}
+
 
 }
 
 void SET_MSG_uart1_handler(void)
 {
+	static volatile uint8_t wait_flag = FALSE;
+		//static volatile uint8_t err_flag = FALSE;
+		static volatile uint8_t msg_2_change = 0x00;
+		uint8_t data_recived = UART_get_mailbox(UART_1);
+		if (wait_flag == TRUE) {
+			set_msg1_exit_flag = TRUE;
+			wait_flag = FALSE;
+			msg_2_change = 0x00;
+		} else if (data_recived != '\e' && data_recived != '\r') {
+			if (!msg_select2_f) {
+				if (data_recived > '0' && data_recived <= '5') {
+					UART_put_char(UART_1, data_recived);
+					UART_put_string(UART_1, &selected[0]);
+					UART_put_char(UART_1, '\r');
+					UART_put_char(UART_1, '\n');
+					msg_2_change = data_recived;
+					msg_select2_f = TRUE;
+				}
+			} else {
+				switch (msg_2_change)
+				{
+					case MSG_1:
+						if (FIFO_push(&msg1, data_recived) == FIFO_FULL)
+							g_limit_reached = TRUE;
+					break;
+					case MSG_2:
+						if (FIFO_push(&msg2 , data_recived) == FIFO_FULL)
+							g_limit_reached = TRUE;
+					break;
+					case MSG_3:
+						if (FIFO_push(&msg3 , data_recived) == FIFO_FULL)
+							g_limit_reached = TRUE;
+					break;
+					case MSG_4:
+						if (FIFO_push(&msg4 , data_recived) == FIFO_FULL)
+							g_limit_reached = TRUE;
+					break;
+					case MSG_5:
+						if (FIFO_push(&msg5 , data_recived) == FIFO_FULL)
+							g_limit_reached = TRUE;
+					break;
+					default:
+					break;
 
+				}
+				UART_put_char(UART_1, data_recived);
+			}
+
+		}
+		if ((data_recived == '\r' && msg_select2_f != FALSE && wait_flag == FALSE) || g_limit_reached == TRUE) {
+			uint8_t err = 0x00;
+			switch (msg_2_change)
+			{
+				case MSG_1:
+					M24LC256_write_sequential(&msg1.data[0], msg1.max_size + 1, MSG1_MEM);
+					UART_put_char(UART_1, '\n');
+					UART_put_char(UART_1, '\r');
+					UART_put_string(UART_1, &return_status[0]);
+					if (!err) {
+						UART_put_string(UART_1, &succ[0]);
+					} else {
+						UART_put_string(UART_1, &unsucc[0]);
+					}
+					UART_put_string(UART_1, &press_any_key[0]);
+					wait_flag = TRUE;
+				break;
+				case MSG_2:
+					M24LC256_write_sequential(&msg2.data[0], msg2.max_size + 1, MSG2_MEM);
+					UART_put_char(UART_1, '\n');
+					UART_put_char(UART_1, '\r');
+					UART_put_string(UART_1, &return_status[0]);
+					if (!err) {
+						UART_put_string(UART_1, &succ[0]);
+					} else {
+						UART_put_string(UART_1, &unsucc[0]);
+					}
+					UART_put_string(UART_1, &press_any_key[0]);
+					wait_flag = TRUE;
+				break;
+				case MSG_3:
+					M24LC256_write_sequential(&msg3.data[0], msg3.max_size + 1, MSG3_MEM);
+					UART_put_char(UART_1, '\n');
+					UART_put_char(UART_1, '\r');
+					UART_put_string(UART_1, &return_status[0]);
+					if (!err) {
+						UART_put_string(UART_1, &succ[0]);
+					} else {
+						UART_put_string(UART_1, &unsucc[0]);
+					}
+					UART_put_string(UART_1, &press_any_key[0]);
+					wait_flag = TRUE;
+				break;
+				case MSG_4:
+					M24LC256_write_sequential(&msg4.data[0], msg4.max_size + 1, MSG4_MEM);
+					UART_put_char(UART_1, '\n');
+					UART_put_char(UART_1, '\r');
+					UART_put_string(UART_1, &return_status[0]);
+					if (!err) {
+						UART_put_string(UART_1, &succ[0]);
+					} else {
+						UART_put_string(UART_1, &unsucc[0]);
+					}
+					UART_put_string(UART_1, &press_any_key[0]);
+					wait_flag = TRUE;
+				break;
+				case MSG_5:
+					M24LC256_write_sequential(&msg5.data[0], msg5.max_size + 1, MSG5_MEM);
+					UART_put_char(UART_1, '\n');
+					UART_put_char(UART_1, '\r');
+					UART_put_string(UART_1, &return_status[0]);
+					if (!err) {
+						UART_put_string(UART_1, &succ[0]);
+					} else {
+						UART_put_string(UART_1, &unsucc[0]);
+					}
+					UART_put_string(UART_1, &press_any_key[0]);
+					wait_flag = TRUE;
+				break;
+				default:
+				break;
+
+			}
+		} else if (data_recived == '\e') {
+			set_msg1_exit_flag = TRUE;
+		}
 }
 uint8_t SET_MSG_get_exit_flag(msg_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case MSG_TERMINAL0:
+		case MSG_TERMINAL1:
 			return set_msg0_exit_flag;
 		break;
-		case MSG_TERMINAL1:
+		case MSG_TERMINAL2:
 			return set_msg1_exit_flag;
 		break;
 		default:
@@ -212,16 +370,17 @@ uint8_t SET_MSG_get_exit_flag(msg_profil_t terminal)
 		break;
 	}
 }
-void SET_MSG_clean_exit_flag(msg_profil_t terminal){
+void SET_MSG_clean_exit_flag(msg_profil_t terminal)
+{
 	switch ((uint8_t) terminal)
-		{
-			case MSG_TERMINAL0:
-				 set_msg0_exit_flag = FALSE;
-			break;
-			case MSG_TERMINAL1:
-				 set_msg1_exit_flag = FALSE;
-			break;
-			default:
-			break;
-		}
+	{
+		case MSG_TERMINAL1:
+			set_msg0_exit_flag = FALSE;
+		break;
+		case MSG_TERMINAL2:
+			set_msg1_exit_flag = FALSE;
+		break;
+		default:
+		break;
+	}
 }

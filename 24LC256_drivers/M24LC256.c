@@ -24,7 +24,7 @@ uint8_t M24LC256_Write_random(uint8_t data, uint16_t str_add)
 	uint8_t low_addres = (uint8_t) str_add & 0xFF;
 
 	I2C_start(I2C_0); /*sends start bit*/
-	I2C_write_byte(I2C_0, M24LC256_WRITE); /*writes the direction of RTC with the write bit enable*/
+	I2C_write_byte(I2C_0, g_address + M24LC256_WRITE); /*writes the direction of RTC with the write bit enable*/
 	I2C_wait(I2C_0); /*waits for response in the line*/
 	pass = !(I2C_get_ack(I2C_0)); /*reads the acknowledge*/
 	if(pass){
@@ -73,8 +73,9 @@ void M24LC256_write_sequential(uint8_t *data_array, uint16_t num_data_write, uin
 	I2C_stop(I2C_0); /*sends nack and stop communications*/
 }
 
-void M24LC256_read_random(uint8_t *data, uint16_t str_add)
+uint8_t M24LC256_read_random( uint16_t str_add)
 {
+	uint8_t data;
 	uint8_t high_address = (uint8_t) (str_add & 0x7F00);
 	uint8_t low_addres = (uint8_t) str_add & 0xFF;
 
@@ -103,7 +104,37 @@ void M24LC256_read_random(uint8_t *data, uint16_t str_add)
 	I2C_wait(I2C_0); //wait to line clear
 
 	I2C_stop(I2C_0); //sends stop bit
-	*data = I2C_read_byte(I2C_0); //read real value
+	data = I2C_read_byte(I2C_0); //read real value
+	return data;
+}
+void M24LC256_fill_memory_With(uint8_t character){
+	uint32_t address = 0x00;
+	for(uint32_t a = 0; a<32;a++){
+
+		 uint32_t add_high = ((address >>8) & 0xFF);
+		 uint32_t add_low = (address & 0xFF);
+		address+=0x40;
+
+		I2C_start(I2C_0); /*sends start bit*/
+		I2C_write_byte(I2C_0, g_address + M24LC256_WRITE); /*writes the direction of RTC with the write bit enable*/
+		I2C_wait(I2C_0); /*waits for response in the line*/
+		I2C_get_ack(I2C_0); /*reads the acknowledge*/
+
+		I2C_write_byte(I2C_0, add_high);/*HIGH half of memory address*/
+		I2C_wait(I2C_0); /*waits for acknowledge*/
+		I2C_get_ack(I2C_0); /*reads acknowledge*/
+
+		I2C_write_byte(I2C_0, add_low);/*HIGH half of memory address*/
+		I2C_wait(I2C_0); /*waits for acknowledge*/
+		I2C_get_ack(I2C_0); /*reads acknowledge*/
+
+		for(uint8_t b = 0; b < 64; b++) {
+			I2C_write_byte(I2C_0, character); /*set data in address*/
+			I2C_wait(I2C_0); /*wait for acknowledge*/
+			I2C_get_ack(I2C_0); /*reads acknowledge*/
+		}
+		I2C_stop(I2C_0); /*sends nack and stop communications*/
+	}
 }
 
 void M24LC256_read_sequential(uint8_t *data_array, uint16_t num_data_ret, uint16_t str_add)

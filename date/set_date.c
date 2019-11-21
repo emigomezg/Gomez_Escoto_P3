@@ -32,7 +32,7 @@ void SET_DATE_display(date_profil_t terminal)
 
 	switch ((uint8_t) terminal)
 	{
-		case DATE_TERMINAL0:
+		case DATE_TERMINAL1:
 			if (FIFO_init(&date0, DATE_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_0, &clean_screen_all[0]);
 				UART_put_string(UART_0, &clean_screen[0]);
@@ -53,7 +53,7 @@ void SET_DATE_display(date_profil_t terminal)
 				set_date0_exit_flag = FALSE;
 			}
 		break;
-		case DATE_TERMINAL1:
+		case DATE_TERMINAL2:
 			if (FIFO_init(&date1, DATE_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_1, &clean_screen_all[0]);
 				UART_put_string(UART_1, &clean_screen[0]);
@@ -174,15 +174,17 @@ void SET_DATE_uart1_handler(void)
 		uint8_t aa[2];
 		aa[0] = FIFO_POP(&date1);
 		aa[1] = FIFO_POP(&date1);
-		uint8_t day = (dd[0] - '0') * 10 + (dd[1] - '0');
+		uint8_t days = (dd[0] - '0') * 10 + (dd[1] - '0');
 		uint8_t month = (mm[0] - '0') * 10 + (mm[1] - '0');
 		uint8_t year = (aa[0] - '0') * 10 + (aa[1] - '0');
-		if (day > 0 && day < 31 && month > 0 && month < 13 && year >= 0 && year < 99) {
-			err_flag =MCP7940M_set_date(day, month, year);
-			if (!err_flag) {
+		if (days >= 0 && days < 24 && month >= 0 && month < 60 && year >= 0 && year < 60) {
+			err_flag = MCP7940M_set_date(days, month, year);
+
+			if (err_flag) {
 				UART_put_string(UART_1, &return_status_pos[0]);
 				UART_put_string(UART_1, &return_status[0]);
 				UART_put_string(UART_1, &succ[0]);
+				err_flag = FALSE;
 			} else {
 				UART_put_string(UART_1, &return_status_pos[0]);
 				UART_put_string(UART_1, &return_status[0]);
@@ -205,10 +207,10 @@ uint8_t SET_DATE_get_exit_flag(date_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case DATE_TERMINAL0:
+		case DATE_TERMINAL1:
 			return set_date0_exit_flag;
 		break;
-		case DATE_TERMINAL1:
+		case DATE_TERMINAL2:
 			return set_date1_exit_flag;
 		break;
 		default:
@@ -216,16 +218,17 @@ uint8_t SET_DATE_get_exit_flag(date_profil_t terminal)
 		break;
 	}
 }
-void SET_DATE_clean_exit_flag(date_profil_t terminal){
+void SET_DATE_clean_exit_flag(date_profil_t terminal)
+{
 	switch ((uint8_t) terminal)
-		{
-			case DATE_TERMINAL0:
-				 set_date0_exit_flag = FALSE;
-			break;
-			case DATE_TERMINAL1:
-				 set_date1_exit_flag = FALSE;
-			break;
-			default:
-			break;
-		}
+	{
+		case DATE_TERMINAL1:
+			set_date0_exit_flag = FALSE;
+		break;
+		case DATE_TERMINAL2:
+			set_date1_exit_flag = FALSE;
+		break;
+		default:
+		break;
+	}
 }

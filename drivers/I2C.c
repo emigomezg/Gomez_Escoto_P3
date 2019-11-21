@@ -205,6 +205,7 @@ void I2C_wait(i2c_channel_t channel)
 	{
 		case I2C_0:
 			I2C0->S |= (I2C_S_IICIF_MASK);
+
 			while ((I2C0->S & I2C_S_IICIF_MASK) == 0)
 				;
 

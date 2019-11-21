@@ -26,14 +26,14 @@ static int8_t return_status_pos[] = { "\033[17:10H" };
 static int8_t return_status[] = { "err getting time\t" };
 static int8_t unsucc[] = { "Unsuccessful\n\r" };
 
-uint8_t get_time0_exit_flag = FALSE;
-uint8_t get_time1_exit_flag = FALSE;
+static uint8_t get_time0_exit_flag = FALSE;
+static uint8_t get_time1_exit_flag = FALSE;
 
 void GET_TIME_display(gtime_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GTIME_TERMINAL0:
+		case GTIME_TERMINAL1:
 			if (FIFO_init(&time0, TIME_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_0, &clean_screen_all[0]);
 				UART_put_string(UART_0, &clean_screen[0]);
@@ -66,7 +66,7 @@ void GET_TIME_display(gtime_profil_t terminal)
 				get_time0_exit_flag = FALSE;
 			}
 		break;
-		case GTIME_TERMINAL1:
+		case GTIME_TERMINAL2:
 			if (FIFO_init(&time1, TIME_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_1, &clean_screen_all[0]);
 				UART_put_string(UART_1, &clean_screen[0]);
@@ -77,7 +77,7 @@ void GET_TIME_display(gtime_profil_t terminal)
 				UART_put_string(UART_1, &inst[0]);
 				UART_put_string(UART_1, &chat_menu_pos[0]);
 				UART_put_string(UART_1, &chat[0]);
-				get_time0_exit_flag = FALSE;
+				get_time1_exit_flag = FALSE;
 				PIT_clock_gating(); //enables pit
 				PIT_enable();
 
@@ -96,7 +96,7 @@ void GET_TIME_display(gtime_profil_t terminal)
 
 				UART_put_string(UART_1, &return_status[0]);
 				UART_put_string(UART_1, &unsucc[0]);
-				get_time0_exit_flag = FALSE;
+				get_time1_exit_flag = FALSE;
 			}
 
 		break;
@@ -117,7 +117,7 @@ void GET_TIMER0_PIT_handler(void)
 	FIFO_push(&time0, '/');
 	FIFO_push(&time0, (seconds / 10) + '0');
 	FIFO_push(&time0, (seconds % 10) + '0');
-	send_to_UART(GTIME_TERMINAL0);
+	send_to_UART(GTIME_TERMINAL1);
 
 }
 void GET_TIMER1_PIT_handler(void)
@@ -141,14 +141,14 @@ void send_to_UART(gtime_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GTIME_TERMINAL0:
+		case GTIME_TERMINAL1:
 			UART_put_string(UART_0, &ret_pos[0]);
 			while (time0.status != FIFO_EMPTY) {
 				UART_put_char(UART_0, FIFO_POP(&time0));
 			}
 
 		break;
-		case GTIME_TERMINAL1:
+		case GTIME_TERMINAL2:
 			UART_put_string(UART_1, &ret_pos[0]);
 			while (time1.status != FIFO_EMPTY) {
 				UART_put_char(UART_1, FIFO_POP(&time1));
@@ -177,11 +177,11 @@ uint8_t GET_TIME_get_exit_flag(gtime_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GTIME_TERMINAL0:
+		case GTIME_TERMINAL1:
 			if (get_time0_exit_flag) PIT_disable_timer(PIT_1);
 			return get_time0_exit_flag;
 		break;
-		case GTIME_TERMINAL1:
+		case GTIME_TERMINAL2:
 			if (get_time1_exit_flag) PIT_disable_timer(PIT_2);
 			return get_time1_exit_flag;
 		break;
@@ -195,11 +195,11 @@ void GET_TIME_clean_exit_flag(gtime_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case GTIME_TERMINAL0:
+		case GTIME_TERMINAL1:
 
 			 get_time0_exit_flag=FALSE;
 		break;
-		case GTIME_TERMINAL1:
+		case GTIME_TERMINAL2:
 			 get_time1_exit_flag =FALSE;
 		break;
 		default:

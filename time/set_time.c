@@ -32,7 +32,7 @@ void SET_TIME_display(time_profil_t terminal)
 
 	switch ((uint8_t) terminal)
 	{
-		case TIME_TERMINAL0:
+		case TIME_TERMINAL1:
 			if (FIFO_init(&time0, TIME_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_0, &clean_screen_all[0]);
 				UART_put_string(UART_0, &clean_screen[0]);
@@ -53,7 +53,7 @@ void SET_TIME_display(time_profil_t terminal)
 				set_time0_exit_flag = FALSE;
 			}
 		break;
-		case TIME_TERMINAL1:
+		case TIME_TERMINAL2:
 			if (FIFO_init(&time1, TIME_FIFO_SIZE) == FIFO_SUCCESS) {
 				UART_put_string(UART_1, &clean_screen_all[0]);
 				UART_put_string(UART_1, &clean_screen[0]);
@@ -145,73 +145,74 @@ void SET_TIME_uart0_handler(void)
 void SET_TIME_uart1_handler(void)
 {
 	static volatile uint8_t wait_flag = FALSE;
-	static volatile uint8_t err_flag = FALSE;
-	uint8_t data_recived = UART_get_mailbox(UART_1);
-	if (wait_flag == TRUE) {
-		set_time1_exit_flag = TRUE;
-		wait_flag = FALSE;
-	}
-	if (data_recived != '\e' && data_recived != '\r' && FIFO_getStatus(&time1) != FIFO_FULL) {
-		FIFO_push(&time1, data_recived);
-		UART_put_char(UART_1, data_recived);
-	} else if (data_recived == '\r' && time1.index < (TIME_FIFO_SIZE - 1)) {
-		UART_put_string(UART_1, &return_status_pos[0]);
-		UART_put_string(UART_1, &return_status[0]);
-		UART_put_string(UART_1, &unsucc[0]);
-		wait_flag = TRUE;
-		UART_put_string(UART_1, &press_any_key_pos[0]);
-		UART_put_string(UART_1, &press_any_key[0]);
-	} else if (data_recived == '\e') {
-		set_time1_exit_flag = TRUE;
-	} else if (time1.status == FIFO_FULL) {
-		uint8_t hh[2];
-		hh[0] = FIFO_POP(&time1);
-		hh[1] = FIFO_POP(&time1);
-		FIFO_POP(&time1);
-		uint8_t mm[2];
-		mm[0] = FIFO_POP(&time1);
-		mm[1] = FIFO_POP(&time1);
-		FIFO_POP(&time1);
-		uint8_t ss[2];
-		ss[0] = FIFO_POP(&time1);
-		ss[1] = FIFO_POP(&time1);
-		uint8_t hours = (hh[0] - '0') * 10 + (hh[1] - '0');
-		uint8_t minutes = (mm[0] - '0') * 10 + (mm[1] - '0');
-		uint8_t seconds = (ss[0] - '0') * 10 + (ss[1] - '0');
-		if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
-			MCP7940M_set_seconds(seconds);
-			MCP7940M_set_minutes(minutes);
-			MCP7940M_set_hours(hours);
-			if (!err_flag) {
-				UART_put_string(UART_1, &return_status_pos[0]);
-				UART_put_string(UART_1, &return_status[0]);
-				UART_put_string(UART_1, &succ[0]);
+		static volatile uint8_t err_flag = FALSE;
+		uint8_t data_recived = UART_get_mailbox(UART_1);
+		if (wait_flag == TRUE) {
+			set_time1_exit_flag = TRUE;
+			wait_flag = FALSE;
+		}
+		if (data_recived != '\e' && data_recived != '\r' && FIFO_getStatus(&time0) != FIFO_FULL) {
+			FIFO_push(&time1, data_recived);
+			UART_put_char(UART_1, data_recived);
+		} else if (data_recived == '\r' && time1.index < (TIME_FIFO_SIZE - 1)) {
+			UART_put_string(UART_1, &return_status_pos[0]);
+			UART_put_string(UART_1, &return_status[0]);
+			UART_put_string(UART_1, &unsucc[0]);
+			wait_flag = TRUE;
+			UART_put_string(UART_1, &press_any_key_pos[0]);
+			UART_put_string(UART_1, &press_any_key[0]);
+		} else if (data_recived == '\e') {
+			set_time1_exit_flag = TRUE;
+		} else if (time1.status == FIFO_FULL) {
+			uint8_t hh[2];
+			hh[0] = FIFO_POP(&time1);
+			hh[1] = FIFO_POP(&time1);
+			FIFO_POP(&time1);
+			uint8_t mm[2];
+			mm[0] = FIFO_POP(&time1);
+			mm[1] = FIFO_POP(&time1);
+			FIFO_POP(&time1);
+			uint8_t ss[2];
+			ss[0] = FIFO_POP(&time1);
+			ss[1] = FIFO_POP(&time1);
+			uint8_t hours = (hh[0] - '0') * 10 + (hh[1] - '0');
+			uint8_t minutes = (mm[0] - '0') * 10 + (mm[1] - '0');
+			uint8_t seconds = (ss[0] - '0') * 10 + (ss[1] - '0');
+			if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
+				err_flag = MCP7940M_set_seconds(seconds);
+				MCP7940M_set_minutes(minutes);
+				MCP7940M_set_hours(hours);
+				if (err_flag) {
+					UART_put_string(UART_1, &return_status_pos[0]);
+					UART_put_string(UART_1, &return_status[0]);
+					UART_put_string(UART_1, &succ[0]);
+					err_flag = FALSE;
+				} else {
+					UART_put_string(UART_1, &return_status_pos[0]);
+					UART_put_string(UART_1, &return_status[0]);
+					UART_put_string(UART_1, &unsucc[0]);
+					err_flag = FALSE;
+				}
 			} else {
 				UART_put_string(UART_1, &return_status_pos[0]);
 				UART_put_string(UART_1, &return_status[0]);
 				UART_put_string(UART_1, &unsucc[0]);
-				err_flag = FALSE;
 			}
-		} else {
-			UART_put_string(UART_1, &return_status_pos[0]);
-			UART_put_string(UART_1, &return_status[0]);
-			UART_put_string(UART_1, &unsucc[0]);
-		}
-		wait_flag = TRUE;
-		UART_put_string(UART_1, &press_any_key_pos[0]);
-		UART_put_string(UART_1, &press_any_key[0]);
+			wait_flag = TRUE;
+			UART_put_string(UART_1, &press_any_key_pos[0]);
+			UART_put_string(UART_1, &press_any_key[0]);
 
-	}
+		}
 
 }
 uint8_t SET_TIME_get_exit_flag(time_profil_t terminal)
 {
 	switch ((uint8_t) terminal)
 	{
-		case TIME_TERMINAL0:
+		case TIME_TERMINAL1:
 			return set_time0_exit_flag;
 		break;
-		case TIME_TERMINAL1:
+		case TIME_TERMINAL2:
 			return set_time1_exit_flag;
 		break;
 		default:
@@ -222,10 +223,10 @@ uint8_t SET_TIME_get_exit_flag(time_profil_t terminal)
 void SET_TIME_clean_exit_flag(time_profil_t terminal){
 	switch ((uint8_t) terminal)
 		{
-			case TIME_TERMINAL0:
+			case TIME_TERMINAL1:
 				 set_time0_exit_flag = FALSE;
 			break;
-			case TIME_TERMINAL1:
+			case TIME_TERMINAL2:
 				 set_time1_exit_flag = FALSE;
 			break;
 			default:

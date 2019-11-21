@@ -68,7 +68,7 @@ void M24LC256_write_sequential(uint8_t *data_array,uint16_t num_data_write, uint
  	 \return void
 
  */
-void M24LC256_read_random(uint8_t *data, uint16_t str_add);
+uint8_t M24LC256_read_random( uint16_t str_add);
 /********************************************************************************************/
 /********************************************************************************************/
 /********************************************************************************************/
@@ -82,6 +82,17 @@ void M24LC256_read_random(uint8_t *data, uint16_t str_add);
 
  */
 void M24LC256_read_sequential(uint8_t *data_array, uint16_t num_data_ret, uint16_t str_add);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief
+ 	 	it fills all memory with a set value
+ 	 \param[in] uint8_t character
+  	 \return void
+
+ */
+void M24LC256_fill_memory_With(uint8_t character);
 
 
 

@@ -17,7 +17,7 @@
 #define TIME_FIFO_SIZE 8
 
 typedef enum{
-	GTIME_TERMINAL0,GTIME_TERMINAL1
+	GTIME_TERMINAL1,GTIME_TERMINAL2
 }gtime_profil_t;
 
 void GET_TIME_display(gtime_profil_t terminal);

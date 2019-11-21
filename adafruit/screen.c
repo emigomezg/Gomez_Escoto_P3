@@ -6,11 +6,11 @@
  */
 
 #include "screen.h"
-static volatile array_to_disp_t array_to_disp;
+static array_to_disp_t array_to_disp;
 
 void screen_clear_data(void)
 {
-	for(int a = MAX_DATA_SIZE-1; a >= NULL; a--) {
+	for(int a = 0; a < MAX_DATA_SIZE; a++) {
 		if (a < SCREEN_H_SIZE)
 			array_to_disp.in_display[a] = '\0';
 		array_to_disp.max_data[a] = '\0';
@@ -48,9 +48,9 @@ void screen_send_array_2mat(void)
 void screen_slideR(void)
 {
 	uint8_t index = array_to_disp.index - 1;
-	uint8_t temp = array_to_disp.max_data[index];
-	for(int16_t a = index; a > 0; a--) {
-		array_to_disp.max_data[a] = array_to_disp.max_data[a-1];
+	uint8_t temp = array_to_disp.max_data[0];
+	for(int16_t a = 1; a <= index; a++) {
+		array_to_disp.max_data[a-1] = array_to_disp.max_data[a];
 	}
-	array_to_disp.max_data[0] = temp;
+	array_to_disp.max_data[index] = temp;
 }

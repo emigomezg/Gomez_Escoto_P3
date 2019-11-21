@@ -11,7 +11,7 @@
 
 void HT16k33_init(void)
 {
-	I2C_init(I2C_0, CLK_K64, baud_rate);
+	//I2C_init(I2C_0, CLK_K64, baud_rate);
 	I2C_start(I2C_0);
 	I2C_write_byte(I2C_0, HT16K33_address);
 	I2C_wait(I2C_0);

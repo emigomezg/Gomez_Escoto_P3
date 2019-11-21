@@ -9,7 +9,7 @@
 #include "fifo.h"
 
 
-fifo_status_t FIFO_init(fifos_t * fifo,uint8_t size){
+fifo_status_t FIFO_init(volatile fifos_t * fifo,uint8_t size){
 
 	if(size>0&&size<=FIFO_MAX_DATA_SIZE){
 	fifo->max_size = size-1;
@@ -22,7 +22,7 @@ fifo_status_t FIFO_init(fifos_t * fifo,uint8_t size){
 	return FIFO_ERR;
 
 }
-fifo_status_t FIFO_push(fifos_t * fifo,uint8_t data)
+fifo_status_t FIFO_push(volatile fifos_t * fifo,uint8_t data)
 {
 	if(FIFO_getStatus(fifo)!=FIFO_FULL){
 		fifo->data[fifo->index] = data;
@@ -35,7 +35,7 @@ fifo_status_t FIFO_push(fifos_t * fifo,uint8_t data)
 	}
 	return FIFO_getStatus(fifo);
 }
-uint8_t FIFO_POP(fifos_t * fifo)
+uint8_t FIFO_POP(volatile fifos_t * fifo)
 {
 	uint8_t ret_data  = 0x00;
 	if(FIFO_getStatus(fifo)!=FIFO_EMPTY){
@@ -52,6 +52,6 @@ uint8_t FIFO_POP(fifos_t * fifo)
 
 
 }
-uint8_t FIFO_getStatus(fifos_t * fifo){
+uint8_t FIFO_getStatus(volatile fifos_t * fifo){
 	return fifo->status;
 }

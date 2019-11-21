@@ -19,10 +19,10 @@
 #define MSG4_MEM 0x60
 #define MSG5_MEM 0x80
 
-#define MSG_FIFO_SIZE 32
+#define MSG_FIFO_SIZE 30
 
 typedef enum{
-	MSG_TERMINAL0,MSG_TERMINAL1
+	MSG_TERMINAL1,MSG_TERMINAL2
 }msg_profil_t;
 
 typedef enum{

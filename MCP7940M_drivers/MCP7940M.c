@@ -145,7 +145,7 @@ uint8_t MCP7940M_get_minutes(void)
 
 	I2C_stop(I2C_0);//sends stop bit
 	data = I2C_read_byte(I2C_0);//read real value
-	return  ((data & 0xF0) >> 4) * 10 + (data & 0x0F);
+	return  ((((data & 0xF0) >> 4) * 10) + (data & 0x0F));
 }
 
 uint8_t MCP7940M_get_hours(void)

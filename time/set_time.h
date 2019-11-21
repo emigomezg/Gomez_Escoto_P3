@@ -16,7 +16,7 @@
 #define TIME_FIFO_SIZE 8
 
 typedef enum{
-	TIME_TERMINAL0,TIME_TERMINAL1
+	TIME_TERMINAL1,TIME_TERMINAL2
 }time_profil_t;
 
 
