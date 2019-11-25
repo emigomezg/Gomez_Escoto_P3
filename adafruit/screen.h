@@ -10,8 +10,8 @@
 #include "adafruit/ht16k33.h"
 #include "adafruit/LETTERS_NUMS.h"
 
-//#define MAX_DATA_SIZE 248
-#define MAX_DATA_SIZE 25
+#define MAX_DATA_SIZE 248
+//#define MAX_DATA_SIZE 25
 #define SCREEN_H_SIZE 16
 
 typedef struct

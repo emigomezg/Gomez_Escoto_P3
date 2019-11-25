@@ -9,7 +9,7 @@
 #define FIFO_H_
 
 #include "MK64F12.h"
-#define FIFO_MAX_DATA_SIZE 99
+#define FIFO_MAX_DATA_SIZE 255
 
 
 typedef struct{

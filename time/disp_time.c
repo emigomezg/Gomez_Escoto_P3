@@ -155,17 +155,44 @@ void DISP_TIMER0_PIT_handler(void)
 void DISP_TIMER1_PIT_handler(void)
 {
 	uint8_t seconds = MCP7940M_get_seconds();
-	uint8_t minutes = MCP7940M_get_minutes();
-	uint8_t hours = MCP7940M_get_hours();
-	FIFO_push(&dtime0, ((hours / 10) + '0'));
-	FIFO_push(&dtime0, ((hours % 10) + '0'));
-	FIFO_push(&dtime0, '/');
-	FIFO_push(&dtime0, ((minutes / 10) + '0'));
-	FIFO_push(&dtime0, ((minutes % 10) + '0'));
-	FIFO_push(&dtime0, '/');
-	FIFO_push(&dtime0, ((seconds / 10) + '0'));
-	FIFO_push(&dtime0, ((seconds % 10) + '0'));
-	DISP_TIME_send_to_UART(DTIME_TERMINAL1);
+		uint8_t minutes = MCP7940M_get_minutes();
+		uint8_t hours = MCP7940M_get_hours();
+		uint8_t ss[2];
+		uint8_t mm[2];
+		uint8_t hh[2];
+
+		hh[0] = (hours / 10) + '0';
+		hh[1] = (hours % 10) + '0';
+
+		mm[0] = (minutes / 10) + '0';
+		mm[1] = (minutes % 10) + '0';
+
+		ss[0] = (seconds / 10) + '0';
+		ss[1] = (seconds % 10) + '0';
+
+		if (seconds >= 0 && seconds < 60 && minutes >= 0 && minutes < 60 && hours >= 0 && hours < 24) {
+			FIFO_push(&dtime1, hh[0]);
+			FIFO_push(&dtime1, hh[1]);
+			FIFO_push(&dtime1, ':');
+			FIFO_push(&dtime1, mm[0]);
+			FIFO_push(&dtime1, mm[1]);
+			FIFO_push(&dtime1, ':');
+			FIFO_push(&dtime1, ss[0]);
+			FIFO_push(&dtime1, ss[1]);
+			DISP_TIME_send_to_UART(DTIME_TERMINAL2);
+			screen_clear_data();
+			screen_add_Item_end(((hours / 10) + '0'));
+			screen_add_Item_end(((hours % 10) + '0'));
+			screen_add_Item_end(((minutes / 10) + '0'));
+			screen_add_Item_end(((minutes % 10) + '0'));
+			screen_send_array_2mat();
+		} else {
+			int8_t err_pos[] = { "\033[16:10H" };
+			UART_put_string(UART_0, &err_pos[0]);
+			int8_t err[] = { "Something went badly wrong with The RTC" };
+			UART_put_string(UART_0, &err[0]);
+
+		}
 
 }
 void DISP_TIME_send_to_UART(dtime_profil_t terminal)

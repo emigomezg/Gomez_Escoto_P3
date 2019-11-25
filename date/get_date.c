@@ -98,24 +98,24 @@ void GET_DATE_display(gdate_profil_t terminal)
 				UART_put_string(UART_1, &unsucc[0]);
 				get_date1_exit_flag = FALSE;
 			}
-
 		break;
 
 	}
 }
 
 void GET_DATE0_PIT_handler(void)
-{uint8_t day = MCP7940M_get_day();
-uint8_t month = MCP7940M_get_month();
-uint8_t year = MCP7940M_get_year();
-FIFO_push(&date0, (day / 10) + '0');
-FIFO_push(&date0, (day % 10) + '0');
-FIFO_push(&date0, '/');
-FIFO_push(&date0, (month / 10) + '0');
-FIFO_push(&date0, (month % 10) + '0');
-FIFO_push(&date0, '/');
-FIFO_push(&date0, (year / 10) + '0');
-FIFO_push(&date0, (year % 10) + '0');
+{
+	uint8_t day = MCP7940M_get_day();
+	uint8_t month = MCP7940M_get_month();
+	uint8_t year = MCP7940M_get_year();
+	FIFO_push(&date0, (day / 10) + '0');
+	FIFO_push(&date0, (day % 10) + '0');
+	FIFO_push(&date0, '/');
+	FIFO_push(&date0, (month / 10) + '0');
+	FIFO_push(&date0, (month % 10) + '0');
+	FIFO_push(&date0, '/');
+	FIFO_push(&date0, (year / 10) + '0');
+	FIFO_push(&date0, (year % 10) + '0');
 	GET_DATE_send_to_UART(GDATE_TERMINAL1);
 	PIT_disable_timer(PIT_1);
 
@@ -137,6 +137,7 @@ void GET_DATE1_PIT_handler(void)
 	PIT_disable_timer(PIT_2);
 
 }
+
 
 void GET_DATE_send_to_UART(gdate_profil_t terminal)
 {
@@ -198,10 +199,10 @@ void GET_DATE_clean_exit_flag(gdate_profil_t terminal)
 	{
 		case GDATE_TERMINAL1:
 
-			 get_date0_exit_flag=FALSE;
+			get_date0_exit_flag = FALSE;
 		break;
 		case GDATE_TERMINAL2:
-			 get_date1_exit_flag =FALSE;
+			get_date1_exit_flag = FALSE;
 		break;
 		default:
 		break;

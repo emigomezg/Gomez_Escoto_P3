@@ -133,7 +133,7 @@ void GET_TIMER1_PIT_handler(void)
 	FIFO_push(&time1, '/');
 	FIFO_push(&time1, (seconds / 10) + '0');
 	FIFO_push(&time1, (seconds % 10) + '0');
-	send_to_UART(GTIME_TERMINAL1);
+	send_to_UART(GTIME_TERMINAL2);
 
 }
 

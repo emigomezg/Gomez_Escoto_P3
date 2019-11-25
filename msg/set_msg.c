@@ -120,24 +120,19 @@ void SET_MSG_uart0_handler(void)
 			switch (msg_2_change)
 			{
 				case MSG_1:
-					if (FIFO_push(&msg1, data_recived) == FIFO_FULL)
-						g_limit_reached = TRUE;
+					if (FIFO_push(&msg1, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_2:
-					if (FIFO_push(&msg2 , data_recived) == FIFO_FULL)
-						g_limit_reached = TRUE;
+					if (FIFO_push(&msg2, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_3:
-					if (FIFO_push(&msg3 , data_recived) == FIFO_FULL)
-						g_limit_reached = TRUE;
+					if (FIFO_push(&msg3, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_4:
-					if (FIFO_push(&msg4 , data_recived) == FIFO_FULL)
-						g_limit_reached = TRUE;
+					if (FIFO_push(&msg4, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_5:
-					if (FIFO_push(&msg5 , data_recived) == FIFO_FULL)
-						g_limit_reached = TRUE;
+					if (FIFO_push(&msg5, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				default:
 				break;
@@ -224,136 +219,130 @@ void SET_MSG_uart0_handler(void)
 		set_msg0_exit_flag = TRUE;
 	}
 
-
 }
 
 void SET_MSG_uart1_handler(void)
 {
 	static volatile uint8_t wait_flag = FALSE;
-		//static volatile uint8_t err_flag = FALSE;
-		static volatile uint8_t msg_2_change = 0x00;
-		uint8_t data_recived = UART_get_mailbox(UART_1);
-		if (wait_flag == TRUE) {
-			set_msg1_exit_flag = TRUE;
-			wait_flag = FALSE;
-			msg_2_change = 0x00;
-		} else if (data_recived != '\e' && data_recived != '\r') {
-			if (!msg_select2_f) {
-				if (data_recived > '0' && data_recived <= '5') {
-					UART_put_char(UART_1, data_recived);
-					UART_put_string(UART_1, &selected[0]);
-					UART_put_char(UART_1, '\r');
-					UART_put_char(UART_1, '\n');
-					msg_2_change = data_recived;
-					msg_select2_f = TRUE;
-				}
-			} else {
-				switch (msg_2_change)
-				{
-					case MSG_1:
-						if (FIFO_push(&msg1, data_recived) == FIFO_FULL)
-							g_limit_reached = TRUE;
-					break;
-					case MSG_2:
-						if (FIFO_push(&msg2 , data_recived) == FIFO_FULL)
-							g_limit_reached = TRUE;
-					break;
-					case MSG_3:
-						if (FIFO_push(&msg3 , data_recived) == FIFO_FULL)
-							g_limit_reached = TRUE;
-					break;
-					case MSG_4:
-						if (FIFO_push(&msg4 , data_recived) == FIFO_FULL)
-							g_limit_reached = TRUE;
-					break;
-					case MSG_5:
-						if (FIFO_push(&msg5 , data_recived) == FIFO_FULL)
-							g_limit_reached = TRUE;
-					break;
-					default:
-					break;
-
-				}
+	//static volatile uint8_t err_flag = FALSE;
+	static volatile uint8_t msg_2_change = 0x00;
+	uint8_t data_recived = UART_get_mailbox(UART_1);
+	if (wait_flag == TRUE) {
+		set_msg1_exit_flag = TRUE;
+		wait_flag = FALSE;
+		msg_2_change = 0x00;
+	} else if (data_recived != '\e' && data_recived != '\r') {
+		if (!msg_select2_f) {
+			if (data_recived > '0' && data_recived <= '5') {
 				UART_put_char(UART_1, data_recived);
+				UART_put_string(UART_1, &selected[0]);
+				UART_put_char(UART_1, '\r');
+				UART_put_char(UART_1, '\n');
+				msg_2_change = data_recived;
+				msg_select2_f = TRUE;
 			}
-
-		}
-		if ((data_recived == '\r' && msg_select2_f != FALSE && wait_flag == FALSE) || g_limit_reached == TRUE) {
-			uint8_t err = 0x00;
+		} else {
 			switch (msg_2_change)
 			{
 				case MSG_1:
-					M24LC256_write_sequential(&msg1.data[0], msg1.max_size + 1, MSG1_MEM);
-					UART_put_char(UART_1, '\n');
-					UART_put_char(UART_1, '\r');
-					UART_put_string(UART_1, &return_status[0]);
-					if (!err) {
-						UART_put_string(UART_1, &succ[0]);
-					} else {
-						UART_put_string(UART_1, &unsucc[0]);
-					}
-					UART_put_string(UART_1, &press_any_key[0]);
-					wait_flag = TRUE;
+					if (FIFO_push(&msg1, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_2:
-					M24LC256_write_sequential(&msg2.data[0], msg2.max_size + 1, MSG2_MEM);
-					UART_put_char(UART_1, '\n');
-					UART_put_char(UART_1, '\r');
-					UART_put_string(UART_1, &return_status[0]);
-					if (!err) {
-						UART_put_string(UART_1, &succ[0]);
-					} else {
-						UART_put_string(UART_1, &unsucc[0]);
-					}
-					UART_put_string(UART_1, &press_any_key[0]);
-					wait_flag = TRUE;
+					if (FIFO_push(&msg2, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_3:
-					M24LC256_write_sequential(&msg3.data[0], msg3.max_size + 1, MSG3_MEM);
-					UART_put_char(UART_1, '\n');
-					UART_put_char(UART_1, '\r');
-					UART_put_string(UART_1, &return_status[0]);
-					if (!err) {
-						UART_put_string(UART_1, &succ[0]);
-					} else {
-						UART_put_string(UART_1, &unsucc[0]);
-					}
-					UART_put_string(UART_1, &press_any_key[0]);
-					wait_flag = TRUE;
+					if (FIFO_push(&msg3, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_4:
-					M24LC256_write_sequential(&msg4.data[0], msg4.max_size + 1, MSG4_MEM);
-					UART_put_char(UART_1, '\n');
-					UART_put_char(UART_1, '\r');
-					UART_put_string(UART_1, &return_status[0]);
-					if (!err) {
-						UART_put_string(UART_1, &succ[0]);
-					} else {
-						UART_put_string(UART_1, &unsucc[0]);
-					}
-					UART_put_string(UART_1, &press_any_key[0]);
-					wait_flag = TRUE;
+					if (FIFO_push(&msg4, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				case MSG_5:
-					M24LC256_write_sequential(&msg5.data[0], msg5.max_size + 1, MSG5_MEM);
-					UART_put_char(UART_1, '\n');
-					UART_put_char(UART_1, '\r');
-					UART_put_string(UART_1, &return_status[0]);
-					if (!err) {
-						UART_put_string(UART_1, &succ[0]);
-					} else {
-						UART_put_string(UART_1, &unsucc[0]);
-					}
-					UART_put_string(UART_1, &press_any_key[0]);
-					wait_flag = TRUE;
+					if (FIFO_push(&msg5, data_recived) == FIFO_FULL) g_limit_reached = TRUE;
 				break;
 				default:
 				break;
 
 			}
-		} else if (data_recived == '\e') {
-			set_msg1_exit_flag = TRUE;
+			UART_put_char(UART_1, data_recived);
 		}
+
+	}
+	if ((data_recived == '\r' && msg_select2_f != FALSE && wait_flag == FALSE) || g_limit_reached == TRUE) {
+		uint8_t err = 0x00;
+		switch (msg_2_change)
+		{
+			case MSG_1:
+				M24LC256_write_sequential(&msg1.data[0], msg1.max_size + 1, MSG1_MEM);
+				UART_put_char(UART_1, '\n');
+				UART_put_char(UART_1, '\r');
+				UART_put_string(UART_1, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_1, &succ[0]);
+				} else {
+					UART_put_string(UART_1, &unsucc[0]);
+				}
+				UART_put_string(UART_1, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
+			case MSG_2:
+				M24LC256_write_sequential(&msg2.data[0], msg2.max_size + 1, MSG2_MEM);
+				UART_put_char(UART_1, '\n');
+				UART_put_char(UART_1, '\r');
+				UART_put_string(UART_1, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_1, &succ[0]);
+				} else {
+					UART_put_string(UART_1, &unsucc[0]);
+				}
+				UART_put_string(UART_1, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
+			case MSG_3:
+				M24LC256_write_sequential(&msg3.data[0], msg3.max_size + 1, MSG3_MEM);
+				UART_put_char(UART_1, '\n');
+				UART_put_char(UART_1, '\r');
+				UART_put_string(UART_1, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_1, &succ[0]);
+				} else {
+					UART_put_string(UART_1, &unsucc[0]);
+				}
+				UART_put_string(UART_1, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
+			case MSG_4:
+				M24LC256_write_sequential(&msg4.data[0], msg4.max_size + 1, MSG4_MEM);
+				UART_put_char(UART_1, '\n');
+				UART_put_char(UART_1, '\r');
+				UART_put_string(UART_1, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_1, &succ[0]);
+				} else {
+					UART_put_string(UART_1, &unsucc[0]);
+				}
+				UART_put_string(UART_1, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
+			case MSG_5:
+				M24LC256_write_sequential(&msg5.data[0], msg5.max_size + 1, MSG5_MEM);
+				UART_put_char(UART_1, '\n');
+				UART_put_char(UART_1, '\r');
+				UART_put_string(UART_1, &return_status[0]);
+				if (!err) {
+					UART_put_string(UART_1, &succ[0]);
+				} else {
+					UART_put_string(UART_1, &unsucc[0]);
+				}
+				UART_put_string(UART_1, &press_any_key[0]);
+				wait_flag = TRUE;
+			break;
+			default:
+			break;
+
+		}
+	} else if (data_recived == '\e') {
+		set_msg1_exit_flag = TRUE;
+	}
 }
 uint8_t SET_MSG_get_exit_flag(msg_profil_t terminal)
 {

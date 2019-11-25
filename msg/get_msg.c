@@ -154,10 +154,6 @@ void GET_MSG_display(gmsg_profil_t terminal)
 				UART_put_string(UART_0, &clean_screen_all[0]);
 				UART_put_string(UART_0, &clean_screen[0]);
 				UART_put_string(UART_0, &red_back_yellow[0]);
-//				UART_put_string(UART_0, &return_status_pos[0]);
-//
-//				UART_put_string(UART_0, &return_status[0]);
-//				UART_put_string(UART_0, &unsucc[0]);
 				get_msg0_exit_flag = FALSE;
 				gmsg_select1_f = FALSE;
 			}
@@ -231,71 +227,64 @@ void GET_MSG_display(gmsg_profil_t terminal)
 					FIFO_push(&gmsg5, data);
 					displacement++;
 				} while (data != '\0');
-				UART_put_char(UART_0, '1');
-				UART_put_char(UART_0, '.');
-				UART_put_char(UART_0, '\t');
+				UART_put_char(UART_1, '1');
+				UART_put_char(UART_1, '.');
+				UART_put_char(UART_1, '\t');
 				for(uint8_t a = 0; a < gmsg1.index; a++)
-					UART_put_char(UART_0, gmsg1.data[a]);
-				UART_put_char(UART_0, '\r');
-				UART_put_char(UART_0, '\n');
+					UART_put_char(UART_1, gmsg1.data[a]);
+				UART_put_char(UART_1, '\r');
+				UART_put_char(UART_1, '\n');
 
-				UART_put_char(UART_0, '2');
-				UART_put_char(UART_0, '.');
-				UART_put_char(UART_0, '\t');
+				UART_put_char(UART_1, '2');
+				UART_put_char(UART_1, '.');
+				UART_put_char(UART_1, '\t');
 				for(uint8_t a = 0; a < gmsg2.index; a++)
-					UART_put_char(UART_0, gmsg2.data[a]);
-				UART_put_char(UART_0, '\r');
-				UART_put_char(UART_0, '\n');
+					UART_put_char(UART_1, gmsg2.data[a]);
+				UART_put_char(UART_1, '\r');
+				UART_put_char(UART_1, '\n');
 
-				UART_put_char(UART_0, '3');
-				UART_put_char(UART_0, '.');
-				UART_put_char(UART_0, '\t');
+				UART_put_char(UART_1, '3');
+				UART_put_char(UART_1, '.');
+				UART_put_char(UART_1, '\t');
 				for(uint8_t a = 0; a < gmsg3.index; a++)
-					UART_put_char(UART_0, gmsg3.data[a]);
-				UART_put_char(UART_0, '\r');
-				UART_put_char(UART_0, '\n');
+					UART_put_char(UART_1, gmsg3.data[a]);
+				UART_put_char(UART_1, '\r');
+				UART_put_char(UART_1, '\n');
 
-				UART_put_char(UART_0, '4');
-				UART_put_char(UART_0, '.');
-				UART_put_char(UART_0, '\t');
+				UART_put_char(UART_1, '4');
+				UART_put_char(UART_1, '.');
+				UART_put_char(UART_1, '\t');
 				for(uint8_t a = 0; a < gmsg4.index; a++)
-					UART_put_char(UART_0, gmsg4.data[a]);
-				UART_put_char(UART_0, '\r');
-				UART_put_char(UART_0, '\n');
+					UART_put_char(UART_1, gmsg4.data[a]);
+				UART_put_char(UART_1, '\r');
+				UART_put_char(UART_1, '\n');
 
-				UART_put_char(UART_0, '5');
-				UART_put_char(UART_0, '.');
-				UART_put_char(UART_0, '\t');
+				UART_put_char(UART_1, '5');
+				UART_put_char(UART_1, '.');
+				UART_put_char(UART_1, '\t');
 				for(uint8_t a = 0; a < gmsg5.index; a++)
-					UART_put_char(UART_0, gmsg5.data[a]);
-				UART_put_char(UART_0, '\r');
-				UART_put_char(UART_0, '\n');
+					UART_put_char(UART_1, gmsg5.data[a]);
+				UART_put_char(UART_1, '\r');
+				UART_put_char(UART_1, '\n');
 
 			} else {
-				UART_put_string(UART_0, &clean_screen_all[0]);
-				UART_put_string(UART_0, &clean_screen[0]);
-				UART_put_string(UART_0, &red_back_yellow[0]);
-				//				UART_put_string(UART_0, &return_status_pos[0]);
-				//
-				//				UART_put_string(UART_0, &return_status[0]);
-				//				UART_put_string(UART_0, &unsucc[0]);
-				get_msg0_exit_flag = FALSE;
-				gmsg_select1_f = FALSE;
+				UART_put_string(UART_1, &clean_screen_all[0]);
+				UART_put_string(UART_1, &clean_screen[0]);
+				UART_put_string(UART_1, &red_back_yellow[0]);
+				get_msg1_exit_flag = FALSE;
+				gmsg_select2_f = FALSE;
 			}
 		break;
-
+		default:
 		break;
 
 	}
 
 }
 
-
-
 void GET_MSG_uart0_handler(void)
 {
 	static volatile uint8_t wait_flag = FALSE;
-	//static volatile uint8_t err_flag = FALSE;
 	static volatile uint8_t msg_2_change = 0x00;
 	uint8_t data_recived = UART_get_mailbox(UART_0);
 	if (wait_flag == TRUE) {
@@ -367,6 +356,74 @@ void GET_MSG_uart0_handler(void)
 }
 void GET_MSG_uart1_handler(void)
 {
+	static volatile uint8_t wait_flag = FALSE;
+	static volatile uint8_t msg_2_change = 0x00;
+	uint8_t data_recived = UART_get_mailbox(UART_1);
+	if (wait_flag == TRUE) {
+		get_msg1_exit_flag = TRUE;
+		wait_flag = FALSE;
+		PIT_disable_timer(PIT_2);
+		screen_clear_data();
+		screen_send_array_2mat();
+	} else if (data_recived != '\e' && data_recived != '\r') {
+		if (!gmsg_select2_f) {
+			if (data_recived > '0' && data_recived <= '5') {
+				UART_put_char(UART_1, data_recived);
+				UART_put_string(UART_1, &selected[0]);
+				UART_put_char(UART_1, '\r');
+				UART_put_char(UART_1, '\n');
+				UART_put_string(UART_1, &press_any_key[0]);
+				msg_2_change = data_recived;
+				gmsg_select2_f = TRUE;
+				wait_flag = TRUE;
+			}
+			switch (msg_2_change)
+			{
+				case GMSG_1:
+					screen_clear_data();
+					while (gmsg1.index != 1) {
+						screen_add_Item_end(FIFO_POP(&gmsg1));
+					}
+					PIT_enable_timer(PIT_2);
+
+				break;
+				case GMSG_2:
+					screen_clear_data();
+					while (gmsg2.index != 1) {
+						screen_add_Item_end(FIFO_POP(&gmsg2));
+					}
+					PIT_enable_timer(PIT_2);
+				break;
+				case GMSG_3:
+					screen_clear_data();
+					while (gmsg3.index != 1) {
+						screen_add_Item_end(FIFO_POP(&gmsg3));
+					}
+					PIT_enable_timer(PIT_2);
+				break;
+				case GMSG_4:
+					screen_clear_data();
+					while (gmsg4.index != 1) {
+						screen_add_Item_end(FIFO_POP(&gmsg4));
+					}
+					PIT_enable_timer(PIT_2);
+				break;
+				case GMSG_5:
+					screen_clear_data();
+					while (gmsg5.index != 1) {
+						screen_add_Item_end(FIFO_POP(&gmsg5));
+					}
+					PIT_enable_timer(PIT_2);
+				break;
+				default:
+				break;
+
+			}
+		}
+
+	} else if (data_recived == '\e') {
+		get_msg1_exit_flag = TRUE;
+	}
 
 }
 void DISP_MSG_PIT_handler(void)
@@ -374,7 +431,6 @@ void DISP_MSG_PIT_handler(void)
 	screen_send_array_2mat();
 	screen_slideR();
 }
-
 
 uint8_t GET_MSG_get_exit_flag(gmsg_profil_t terminal)
 {

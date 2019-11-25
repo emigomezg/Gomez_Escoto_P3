@@ -86,8 +86,8 @@ void SET_DATE_uart0_handler(void)
 	if (wait_flag == TRUE) {
 		set_date0_exit_flag = TRUE;
 		wait_flag = FALSE;
-	}
-	if (data_recived != '\e' && data_recived != '\r' && FIFO_getStatus(&date0) != FIFO_FULL) {
+		err_flag = FALSE;
+	} else if (data_recived != '\e' && data_recived != '\r' && FIFO_getStatus(&date0) != FIFO_FULL) {
 		FIFO_push(&date0, data_recived);
 		UART_put_char(UART_0, data_recived);
 	} else if (data_recived == '\r' && date0.index < (DATE_FIFO_SIZE - 1)) {
@@ -149,8 +149,8 @@ void SET_DATE_uart1_handler(void)
 	if (wait_flag == TRUE) {
 		set_date1_exit_flag = TRUE;
 		wait_flag = FALSE;
-	}
-	if (data_recived != '\e' && data_recived != '\r' && FIFO_getStatus(&date1) != FIFO_FULL) {
+		err_flag = FALSE;
+	} else if (data_recived != '\e' && data_recived != '\r' && FIFO_getStatus(&date1) != FIFO_FULL) {
 		FIFO_push(&date1, data_recived);
 		UART_put_char(UART_1, data_recived);
 	} else if (data_recived == '\r' && date1.index < (DATE_FIFO_SIZE - 1)) {

@@ -32,9 +32,11 @@
 #include "msg/get_msg.h"
 #include "msg/set_msg.h"
 
+#include "chat/chat.h"
+
 
 typedef enum{
-	ST_MENU,ST_CHAT,ST_SET_HOUR,ST_SET_DATE,ST_READ_HOUR,ST_DISP_HOUR_MAT,ST_SET_MSG,ST_DISP_MSG,ST_READ_DATE
+	ST_MENU,ST_CHAT,ST_SET_HOUR,ST_SET_DATE,ST_READ_HOUR,ST_DISP_HOUR_MAT,ST_SET_MSG,ST_DISP_MSG,ST_READ_DATE,ST_BUSY
 }pms_states_t;
 
 typedef struct {
@@ -68,5 +70,8 @@ void PSM_main_menu(terminals ter);
 
 void PSM0_STATE_MENU(void);
 void PSM1_STATE_MENU(void);
+
+void PSM_Busy_T1_handler(void);
+void PSM_Busy_T2_handler(void);
 
 #endif /* PSM_H_ */

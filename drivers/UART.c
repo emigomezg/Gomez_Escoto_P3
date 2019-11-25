@@ -79,9 +79,9 @@ void UART_init(uart_channel_t uart_channel, uint32_t system_clk,
 		break;
 	case UART_1:
 		UART1->C2 &= ~(UART_C2_RE_MASK | UART_C2_TE_MASK);
-		UART1->BDH |= (baud_rate & (UART_BDH_SBR_MASK << 8)) >> 8;
-		UART1->BDL |= (baud_rate & UART_BDL_SBR_MASK);
-		UART1->C4 |= UART_C4_BRFA(brfa);
+		UART1->BDH |= 0;
+		UART1->BDL = 11;
+		UART1->C4 |= 0xD;
 		UART1->C2 |= (UART_C2_RE_MASK | UART_C2_TE_MASK);
 		break;
 	case UART_2:
@@ -144,8 +144,19 @@ void UART_interrupt_enable(uart_channel_t uart_channel) {
 }
 
 void UART_put_char(uart_channel_t uart_channel, uint8_t character) {
-	while (!(UART0->S1 &  UART_S1_TDRE_MASK));
-	UART0->D = character;
+	switch(uart_channel)
+	{
+		case UART_0:
+		while (!(UART0->S1 &  UART_S1_TDRE_MASK));
+			UART0->D = character;
+			break;
+		case UART_1:
+			while (!(UART1->S1 &  UART_S1_TDRE_MASK));
+					UART1->D = character;
+			break;
+		default:
+			break;
+	}
 }
 
 void UART_put_string(uart_channel_t uart_channel, int8_t* string) {
@@ -177,6 +188,8 @@ void UART1_RX_TX_IRQHandler(void) {
 		;
 	g_mail_box_uart_1.flag = 1;
 	g_mail_box_uart_1.mailBox = UART1->D;
+	if(UART0_RX_HANDLER)
+			UART1_RX_HANDLER();
 
 }
 
