@@ -251,7 +251,7 @@ uint8_t MCP7940M_set_date(uint8_t day, uint8_t month, uint8_t year)
 				break;
 			}
 		}
-		if(day>=1 &&  day<day_limit)
+		if(day>=1 &&  day<=day_limit)
 			{
 				day =((day / 10) << 4) | (day % 10);
 				I2C_start(I2C_0);//sends start bit

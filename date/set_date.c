@@ -114,7 +114,7 @@ void SET_DATE_uart0_handler(void)
 		uint8_t days = (dd[0] - '0') * 10 + (dd[1] - '0');
 		uint8_t month = (mm[0] - '0') * 10 + (mm[1] - '0');
 		uint8_t year = (aa[0] - '0') * 10 + (aa[1] - '0');
-		if (days >= 0 && days < 24 && month >= 0 && month < 60 && year >= 0 && year < 60) {
+		if (days > 0 && days <= 31 && month > 0 && month <= 12 && year >= 0 && year <= 99) {
 			err_flag = MCP7940M_set_date(days, month, year);
 
 			if (err_flag) {
